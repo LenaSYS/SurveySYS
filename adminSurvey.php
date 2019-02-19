@@ -51,6 +51,12 @@
 	$log_db->exec($sql);	
 	
 	if($cmd!="UNK"){
+		
+			// Insert new survey data
+			if($cmd="NEW"){
+					echo "Making new survey";
+			}
+		
 			// Make survvey administration form 
 			echo "<form method='POST' name='editSurvey' action='adminSurvey.php' >\n";
 			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
