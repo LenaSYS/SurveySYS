@@ -106,7 +106,7 @@ session_start();
 			}
 	}else{
 			// Make survvey administration form 
-			echo "<form method='POST' name='editSurvey' action='adminSurvey.php' >\n";
+			echo "<form method='POST' name='editSurvey' action='createSurvey.php' >\n";
 			echo "<input type='hidden' name='CMD' value='NEW' >\n";
 			echo "<table>\n";
 			echo "<tr><td>Name:</td><td><input type='text' name='crename' value='New Survey Name' ></td></tr>\n";
