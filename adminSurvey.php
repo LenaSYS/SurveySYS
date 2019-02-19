@@ -50,7 +50,7 @@
 	$sql = 'CREATE TABLE IF NOT EXISTS survey(id INTEGER PRIMARY KEY,hash varchar(32),name varchar(64), description TEXT, admincode varchar(10));';
 	$log_db->exec($sql);	
 	
-	if($cmd=="EDIT"){
+	if($cmd!="UNK"){
 			// Make survvey administration form 
 			echo "<form method='POST' name='editSurvey' action='adminSurvey.php' >\n";
 			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
