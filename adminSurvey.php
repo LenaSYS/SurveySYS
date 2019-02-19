@@ -1,3 +1,7 @@
+<?php
+// Start the session
+session_start();
+?>
 <html>
  
 	<head>
@@ -99,26 +103,6 @@
 					echo "<tr><td>Admin Code: ".$admincode."</td></tr>";
 					echo "</table>\n";
 					echo "</div>\n";
-			}else if($cmd=='EDIT'){
-					echo "EDIT SURVEY";
-				
-					$datarow=Array();
-
-					// Retrieve full database and swizzle into associative array for each day
-					$result = $log_db->query('SELECT * FROM survey where hash=:hash and admincode=:admincode;');
-					if (!$result) {
-							$error = $log_db->errorInfo();
-							print_r($error);
-					}else{
-							$rows = $result->fetchAll();	
-							foreach($rows as $row){
-									$datarow=$row;
-							}
-					}
-				
-					if(sizeof($datarow)){
-							echo "Kloo!";
-					}
 			}
 	}else{
 			// Make survvey administration form 
@@ -136,14 +120,16 @@
 	}
 
 			// Make survvey administration form 
-			echo "<form method='POST' name='editSurvey' action='adminSurvey.php' >\n";
+			echo "<div id='admincode'>\n";
+			echo "<form method='POST' name='editSurvey' action='editsurvey.php' >\n";
 			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
 			echo "<table>\n";
 			echo "<tr><td>Hash:</td><td><input type='text' value='Enter Hash' name='hash' ></td></tr>\n";
 			echo "<tr><td>Code:</td><td><input type='text' value='Admin Code' name='admincode' ></td></tr>\n";		
 			echo "</table>\n";
-			echo "<input type='submit' value='Save Survey' >\n";
+			echo "<input type='submit' value='Edit Survey' >\n";
 			echo "</form>\n";
+			echo "</div>\n";
 		
 ?>
 		
