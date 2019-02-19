@@ -78,13 +78,13 @@
 	if($cmd!="UNK"){
 		
 			// Insert new survey data
-			if($cmd="NEW"){
+			if($cmd=="NEW"){
 					echo "Making new survey";
 					$query = $log_db->prepare('INSERT INTO survey(hash,name,description,admincode) VALUES (:hash,:name,:description,:admincode)');
 					
 					$query->bindParam(':hash', $hash);
 					$query->bindParam(':name', $crename);
-					$query->bindParam(':description', $description);
+					$query->bindParam(':description', $desc);
 					$query->bindParam(':admincode', $admincode);				
 				
 					if (!$query->execute()) {
@@ -99,18 +99,27 @@
 					echo "<tr><td>Admin Code: ".$admincode."</td></tr>";
 					echo "</table>\n";
 					echo "</div>\n";
-			}else if($cmd='EDIT'){
-			
+			}else if($cmd=='EDIT'){
+					echo "EDIT SURVEY";
+				
+					$datarow=Array();
+
+					// Retrieve full database and swizzle into associative array for each day
+					$result = $log_db->query('SELECT * FROM survey where hash=:hash and admincode=:admincode;');
+					if (!$result) {
+							$error = $log_db->errorInfo();
+							print_r($error);
+					}else{
+							$rows = $result->fetchAll();	
+							foreach($rows as $row){
+									$datarow=$row;
+							}
+					}
+				
+					if(sizeof($datarow)){
+							echo "Kloo!";
+					}
 			}
-		
-			// Make survvey administration form 
-			echo "<form method='POST' name='editSurvey' action='adminSurvey.php' >\n";
-			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
-			echo "<table>\n";
-			echo "<tr><td>Name:</td><td><input type='text' name='crename' value='".$crename."' ></td></tr>\n";
-			echo "</table>\n";
-			echo "<input type='submit' value='Save Survey' >\n";
-			echo "</form>\n";
 	}else{
 			// Make survvey administration form 
 			echo "<form method='POST' name='editSurvey' action='adminSurvey.php' >\n";
@@ -125,6 +134,16 @@
 			echo "<input type='submit' value='Create Survey' >\n";
 			echo "</form>\n";
 	}
+
+			// Make survvey administration form 
+			echo "<form method='POST' name='editSurvey' action='adminSurvey.php' >\n";
+			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
+			echo "<table>\n";
+			echo "<tr><td>Hash:</td><td><input type='text' value='Enter Hash' name='hash' ></td></tr>\n";
+			echo "<tr><td>Code:</td><td><input type='text' value='Admin Code' name='admincode' ></td></tr>\n";		
+			echo "</table>\n";
+			echo "<input type='submit' value='Save Survey' >\n";
+			echo "</form>\n";
 		
 ?>
 		
