@@ -19,7 +19,9 @@
 	<body>
 		
 <?php			
-	
+
+	date_default_timezone_set('Europe/Stockholm');
+
 	//------------------------------------------------------------------------------------------------
 	// getOP
 	//------------------------------------------------------------------------------------------------
@@ -32,22 +34,42 @@
 
 	//------------------------------------------------------------------------------------------------
 
+	echo "<pre>";
+	print_r($_POST);
+	echo "</pre>\n";
+		
+	// Command
+	$cmd=getOP('CMD');
+
+	// Parameters
 	$crename=getOP('crename');
 	$desc=getOP('desc');
 	$admincode=getOP('admincode');
 		
-	date_default_timezone_set('Europe/Stockholm');
-	
 	$log_db = new PDO('sqlite:./surveydata.db');
 	$sql = 'CREATE TABLE IF NOT EXISTS survey(id INTEGER PRIMARY KEY,hash varchar(32),name varchar(64), description TEXT, admincode varchar(10));';
 	$log_db->exec($sql);	
 	
-	if($crename!="UNK"){
-			echo "CREATING";
+	if($cmd=="EDIT"){
+			// Make survvey administration form 
+			echo "<form method='POST' name='editSurvey' action='adminSurvey.php' >\n";
+			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
+			echo "<table>\n";
+			echo "<tr><td>Name:</td><td><input type='text' name='crename' value='".$crename."' ></td></tr>\n";
+			echo "</table>\n";
+			echo "<input type='submit' value='Save Survey' >\n";
+			echo "</form>\n";
 	}else{
-			echo "NOT CREATING";	
+			// Make survvey administration form 
+			echo "<form method='POST' name='editSurvey' action='adminSurvey.php' >\n";
+			echo "<input type='hidden' name='CMD' value='NEW' >\n";
+			echo "<table>\n";
+			echo "<tr><td>Name:</td><td><input type='text' name='crename' value='New Survey Name' ></td></tr>\n";
+			echo "</table>\n";
+			echo "<input type='submit' value='Create Survey' >\n";
+			echo "</form>\n";
 	}
-
+		
 ?>
 		
 		</body>
