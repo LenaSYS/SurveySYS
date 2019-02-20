@@ -133,9 +133,41 @@ session_start();
 							$error = $query->errorInfo();
 							$debug = "Error updating database: " . $error[2];
 					}
-				
 			}
-
+		
+			echo "<table>";
+			echo "<tr><th>Type</th><th>Labels</th></tr>";
+			// Retrieve full database and swizzle into associative array for each day
+			$query=$log_db->prepare('SELECT * FROM item where hash=:hash order by questno;');
+			$query->bindParam(':hash', $hash);
+			if (!$query->execute()) {
+					$error = $log_db->errorInfo();
+					print_r($error);
+			}else{
+					$rows = $query->fetchAll();	
+					foreach($rows as $row){
+								echo "<tr>";
+								
+								echo "<td><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'><select name='type'>";
+								if($row['type']==1){
+										echo "<option value='1' selected='selected'>Link</option><option value='2'>Number</option><option value='3'>Text</option></select>";		
+								}else if($row['type']==2){
+											echo "<option value='1'>Link</option><option value='2' selected='selected'>Number</option><option value='3'>Text</option></select>";		
+								}else if($row['type']==3){
+											echo "<option value='1'>Link</option><option value='2'>Number</option><option value='3' selected='selected'>Text</option></select>";		
+								}else{
+										echo "Unknown type: ".$row['type'];
+								}
+								echo "</select>";
+								echo "<input type='hidden' name='CMD' value='UPDTYPE'>";
+								echo "<input type='submit' value='Save' >\n";
+								echo "</form></td>";
+						
+						
+								echo "</tr>";
+					}
+			}
+			echo "</table>";
 			
 	}else{
 			// Make survvey administration form 
