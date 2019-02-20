@@ -55,7 +55,8 @@ session_start();
 	echo "<pre>";
 	print_r($_SESSION);
 	echo "</pre>\n";		
-		
+
+	$cmd=getOP('CMD');
 	$hash=getOP('hash');
 	$admincode=getOP('admincode');
 	if(isset($_SESSION['hash'])) $hash=$_SESSION['hash'];
@@ -64,9 +65,9 @@ session_start();
 	$log_db = new PDO('sqlite:./surveydata.db');
 	$sql = 'CREATE TABLE IF NOT EXISTS survey(id INTEGER PRIMARY KEY,hash varchar(32),name varchar(64), description TEXT, admincode varchar(10));';
 	$log_db->exec($sql);
-	$sql = 'CREATE TABLE IF NOT EXISTS item(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER, description TEXT, type INTEGER);';		
+	$sql = 'CREATE TABLE IF NOT EXISTS item(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER,labelA text, labelB text, labelC text, description TEXT, type INTEGER);';		
 	$log_db->exec($sql);	
-	$sql = 'CREATE TABLE IF NOT EXISTS response(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER, type INTEGER, value TEXT, useragent TEXT, userhash varchar(32));';		
+	$sql = 'CREATE TABLE IF NOT EXISTS response(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER, value TEXT, useragent TEXT, userhash varchar(32));';		
 	$log_db->exec($sql);	
 		
 	$datarow=Array();
@@ -93,8 +94,38 @@ session_start();
 			$_SESSION['hash']=$hash;
 			$_SESSION['admincode']=$admincode;
 
+			echo "<div id='admincode'>\n";
+			echo "<form method='POST' name='editSurvey' action='editsurvey.php' >\n";
+			echo "<input type='hidden' name='CMD' value='NEW' >\n";
+			echo "<table>\n";
+			echo "<tr><td>Type:</td><td><select name='type'><option value='1'>Link</option><option value='2'>Number</option><option value='3'>Text</option></select></td></tr>\n";		
+			echo "<tr><td>Question:</td><td><input type='text' name='description'></td></tr>\n";		
+			echo "<tr><td>Left Label:</td><td><input type='text' name='labelA'></td></tr>\n";		
+			echo "<tr><td>Right Label:</td><td><input type='text' name='labelB'></td></tr>\n";
+			echo "<tr><td>Center Label:</td><td><input type='text' name='labelC'></td></tr>\n";		
+			echo "</table>\n";
+			echo "<input type='submit' value='New Item' >\n";
+			echo "</form>\n";
+			echo "</div>\n";
+		
+			if($cmd=="NEW"){
+					echo "MAKING NEW!!!";
+			}
+
 			
-	}	
+	}else{
+			// Make survvey administration form 
+			echo "<div id='admincode'>\n";
+			echo "<form method='POST' name='editSurvey' action='editsurvey.php' >\n";
+			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
+			echo "<table>\n";
+			echo "<tr><td>Hash:</td><td><input type='text' value='Enter Hash' name='hash' ></td></tr>\n";
+			echo "<tr><td>Code:</td><td><input type='text' value='Admin Code' name='admincode' ></td></tr>\n";		
+			echo "</table>\n";
+			echo "<input type='submit' value='Edit Survey' >\n";
+			echo "</form>\n";
+			echo "</div>\n";
+	}
 		
 ?>
 		
