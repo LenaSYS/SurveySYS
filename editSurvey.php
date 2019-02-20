@@ -137,8 +137,6 @@ session_start();
 					}
 			}
 		
-			echo "<table>";
-			echo "<tr><th>Rowno</th><th>Type</th><th>Labels (Left Right Center)</th><th>Description/Question</th></tr>";
 			// Retrieve full database and swizzle into associative array for each day
 			$query=$log_db->prepare('SELECT * FROM item where hash=:hash order by questno;');
 			$query->bindParam(':hash', $hash);
@@ -146,6 +144,11 @@ session_start();
 					$error = $log_db->errorInfo();
 					print_r($error);
 			}else{
+				
+					echo "<table>";
+					echo "<tr><th>Rowno</th><th>Type</th><th>Labels (Left Right Center)</th><th>Description/Question</th></tr>";
+
+					$lastrow='UNK';
 					$rows = $query->fetchAll();	
 					foreach($rows as $row){
 								echo "<tr>";
@@ -184,11 +187,77 @@ session_start();
 								echo "<input type='hidden' name='CMD' value='UPDDESC'>";
 								echo "<input type='submit' value='Save' >\n";
 								echo "</form></td>";								
+
+								// Swap
+								echo "<td style='border:1px solid red;border-radius:4px;'><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'>";
+								echo "<input type='hidden' name='CMD' value='SWAP'>";
+								if($lastrow!="UNK"){
+										echo "<input type='submit' value='Swap' >\n";
+										echo "<input type='hidden' name='Swap' value='".$lastrow."'>";
+										echo "<input type='hidden' name='SwapOut' value='".$row['id']."'>";									
+								}
+								echo "</form></td>";
+
+								// Del
+								echo "<td style='border:1px solid red;border-radius:4px;'><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'>";
+								echo "<input type='hidden' name='CMD' value='DEL'>";
+								echo "<input type='submit' value='Del' >\n";
+								echo "</form></td>";
 						
 								echo "</tr>";
+						
+								$lastrow=$row['id'];
 					}
+					echo "</table>";
+
+					echo "<h3>Preview</h3>";	
+				
+					// Preview
+					echo "<table>";
+	
+					foreach($rows as $row){
+							echo "<tr>";
+							if($row['type']==2){
+									echo "<td>";
+									echo "<table>";
+									
+									// Question / Description
+									echo "<tr><td colspan='7'>".$row['description']."</td></tr>";
+									
+									// Radio Buttons
+									echo "<tr>";
+									for($i=1;$i<8;$i++){
+											echo "<td><input type='radio' name='qq".$row['id']."' value='".$i."'></td>";
+									}
+									echo "</tr>";
+								
+									// Labels
+									echo "<tr>";
+									echo "<td style='text-align:left;' colspan='2'>".$row['labelA']."</td>";
+									echo "<td style='text-align:center;' colspan='3'>".$row['labelC']."</td>";
+									echo "<td style='text-align:right;' colspan='2'>".$row['labelB']."</td>";								
+									echo "</tr>";
+								
+									echo "</table>";
+									echo "</td>";
+							}else if($row['type']==3){
+									echo "<td><table>";
+
+									// Question / Description
+									echo "<tr><td colspan='2'>".$row['description']."</td></tr>";
+								
+									// Text Input with Labels
+									echo "<td>".$row['labelA'].":</td><td><input type='text' name='qq".$row['id']."' value='".$row['labelC']."'></td>";
+									
+									echo "</table></td>";
+							}
+							echo "</tr><tr></tr>";
+					}
+				
+					echo "</table>";
 			}
-			echo "</table>";
+			
+			
 			
 	}else{
 			// Make survvey administration form 
