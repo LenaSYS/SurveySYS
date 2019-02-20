@@ -56,6 +56,12 @@ session_start();
 	print_r($_SESSION);
 	echo "</pre>\n";		
 
+	$description=getOP('description');
+	$labelA=getOP('labelA');
+	$labelB=getOP('labelB');		
+	$labelC=getOP('labelC');
+	$type=getOP('type');
+		
 	$cmd=getOP('CMD');
 	$hash=getOP('hash');
 	$admincode=getOP('admincode');
@@ -69,6 +75,8 @@ session_start();
 	$log_db->exec($sql);	
 	$sql = 'CREATE TABLE IF NOT EXISTS response(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER, value TEXT, useragent TEXT, userhash varchar(32));';		
 	$log_db->exec($sql);	
+
+	$log_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 		
 	$datarow=Array();
 
@@ -110,6 +118,22 @@ session_start();
 		
 			if($cmd=="NEW"){
 					echo "MAKING NEW!!!";
+				
+					//$query = $log_db->prepare('INSERT INTO item(hash,description,type,labelA,labelB,labelC,questno) VALUES (:hash,:description,:type,:labelA,:labelB,:labelC,(select count(*) from item where hash=:hasho)+1)');
+					$query = $log_db->prepare('INSERT INTO item(hash,description,type,labelA,labelB,labelC,questno) VALUES (:hash,:description,:type,:labelA,:labelB,:labelC,(select count(*) from item where hash=:hasho)+1)');					
+					$query->bindParam(':hash', $hash);
+					$query->bindParam(':hasho', $hash);				
+					$query->bindParam(':labelA', $labelA);
+					$query->bindParam(':labelB', $labelB);
+					$query->bindParam(':labelC', $labelC);
+					$query->bindParam(':type', $type);
+					$query->bindParam(':description', $description);				
+				
+					if (!$query->execute()) {
+							$error = $query->errorInfo();
+							$debug = "Error updating database: " . $error[2];
+					}
+				
 			}
 
 			
