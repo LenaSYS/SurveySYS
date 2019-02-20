@@ -22,6 +22,10 @@ session_start();
 			padding: 8px;
 			
 	}
+		
+	form {
+			margin:0px;
+	}
 
 	</style>
 
@@ -48,6 +52,7 @@ session_start();
 
 	//------------------------------------------------------------------------------------------------
 
+/*
 	echo "<pre>";
 	print_r($_POST);
 	echo "</pre>\n";
@@ -55,7 +60,8 @@ session_start();
 	echo "<pre>";
 	print_r($_SESSION);
 	echo "</pre>\n";		
-
+*/
+		
 	$description=getOP('description');
 	$labelA=getOP('labelA');
 	$labelB=getOP('labelB');		
@@ -93,10 +99,6 @@ session_start();
 					$datarow=$row;
 			}
 	}
-		
-	echo "<pre>";
-	print_r($datarow);
-	echo "</pre>\n";	
 		
 	if(sizeof($datarow)>0){
 			$_SESSION['hash']=$hash;
@@ -136,7 +138,7 @@ session_start();
 			}
 		
 			echo "<table>";
-			echo "<tr><th>Type</th><th>Labels</th></tr>";
+			echo "<tr><th>Rowno</th><th>Type</th><th>Labels (Left Right Center)</th><th>Description/Question</th></tr>";
 			// Retrieve full database and swizzle into associative array for each day
 			$query=$log_db->prepare('SELECT * FROM item where hash=:hash order by questno;');
 			$query->bindParam(':hash', $hash);
@@ -148,7 +150,11 @@ session_start();
 					foreach($rows as $row){
 								echo "<tr>";
 								
-								echo "<td><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'><select name='type'>";
+								// Number
+								echo "<td>".$row['questno']."</td>";
+								
+								// Type
+								echo "<td style='border:1px solid red;border-radius:4px;'><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'><select name='type'>";
 								if($row['type']==1){
 										echo "<option value='1' selected='selected'>Link</option><option value='2'>Number</option><option value='3'>Text</option></select>";		
 								}else if($row['type']==2){
@@ -162,7 +168,22 @@ session_start();
 								echo "<input type='hidden' name='CMD' value='UPDTYPE'>";
 								echo "<input type='submit' value='Save' >\n";
 								echo "</form></td>";
+
+								// Labels
+								echo "<td style='border:1px solid red;border-radius:4px;'><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'>";
+								echo "<input type='text' name='labelA' value='".$row['labelA']."' >";
+								echo "<input type='text' name='labelB' value='".$row['labelB']."' >";
+								echo "<input type='text' name='labelC' value='".$row['labelC']."' >";						
+								echo "<input type='hidden' name='CMD' value='UPDLABEL'>";
+								echo "<input type='submit' value='Save' >\n";
+								echo "</form></td>";
 						
+								// Description
+								echo "<td style='border:1px solid red;border-radius:4px;'><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'>";
+								echo "<textarea name='description' >".$row['description']."</textarea>";				
+								echo "<input type='hidden' name='CMD' value='UPDDESC'>";
+								echo "<input type='submit' value='Save' >\n";
+								echo "</form></td>";								
 						
 								echo "</tr>";
 					}
