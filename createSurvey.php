@@ -77,6 +77,10 @@ session_start();
 		
 	$log_db = new PDO('sqlite:./surveydata.db');
 	$sql = 'CREATE TABLE IF NOT EXISTS survey(id INTEGER PRIMARY KEY,hash varchar(32),name varchar(64), description TEXT, admincode varchar(10));';
+	$log_db->exec($sql);			
+	$sql = 'CREATE TABLE IF NOT EXISTS item(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER, description TEXT, type INTEGER);';		
+	$log_db->exec($sql);	
+	$sql = 'CREATE TABLE IF NOT EXISTS response(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER, type INTEGER, value TEXT, useragent TEXT, userhash varchar(32));';		
 	$log_db->exec($sql);	
 	
 	if($cmd!="UNK"){

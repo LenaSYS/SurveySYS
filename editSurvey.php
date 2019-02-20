@@ -58,24 +58,28 @@ session_start();
 		
 	$hash=getOP('hash');
 	$admincode=getOP('admincode');
-	if(isset($_SESSION['hash'])) $login=$_SESSION['hash'];
-	if(isset($_SESSION['admincode'])) $password=$_SESSION['admincode'];	
+	if(isset($_SESSION['hash'])) $hash=$_SESSION['hash'];
+	if(isset($_SESSION['admincode'])) $admincode=$_SESSION['admincode'];	
 
 	$log_db = new PDO('sqlite:./surveydata.db');
 	$sql = 'CREATE TABLE IF NOT EXISTS survey(id INTEGER PRIMARY KEY,hash varchar(32),name varchar(64), description TEXT, admincode varchar(10));';
 	$log_db->exec($sql);
+	$sql = 'CREATE TABLE IF NOT EXISTS item(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER, description TEXT, type INTEGER);';		
+	$log_db->exec($sql);	
+	$sql = 'CREATE TABLE IF NOT EXISTS response(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER, type INTEGER, value TEXT, useragent TEXT, userhash varchar(32));';		
+	$log_db->exec($sql);	
 		
 	$datarow=Array();
 
 	// Retrieve full database and swizzle into associative array for each day
-	$result = $log_db->query('SELECT * FROM survey where hash=:hash and admincode=:admincode;');
+	$query=$log_db->prepare('SELECT * FROM survey where hash=:hash and admincode=:admincode;');
 	$query->bindParam(':hash', $hash);
 	$query->bindParam(':admincode', $admincode);		
 	if (!$query->execute()) {
 			$error = $log_db->errorInfo();
 			print_r($error);
 	}else{
-			$rows = $result->fetchAll();	
+			$rows = $query->fetchAll();	
 			foreach($rows as $row){
 					$datarow=$row;
 			}
@@ -89,7 +93,7 @@ session_start();
 			$_SESSION['hash']=$hash;
 			$_SESSION['admincode']=$admincode;
 
-			echo "Kloo!";
+			
 	}	
 		
 ?>
