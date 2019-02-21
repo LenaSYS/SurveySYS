@@ -101,6 +101,9 @@ session_start();
 	}
 		
 	if(sizeof($datarow)>0){
+		
+			echo "Survey: ".$hash."<br>";
+		
 			$_SESSION['hash']=$hash;
 			$_SESSION['admincode']=$admincode;
 
