@@ -230,7 +230,7 @@ session_start();
 									// Radio Buttons
 									echo "<tr>";
 									for($i=1;$i<8;$i++){
-											echo "<td><input type='radio' name='qq".$row['id']."' value='".$i."'></td>";
+											echo "<td><input type='radio' name='qq_".$row['id']."_".$row['questno']."' value='".$i."'></td>";
 									}
 									echo "</tr>";
 								
@@ -250,7 +250,7 @@ session_start();
 									echo "<tr><td colspan='2'>".$row['description']."</td></tr>";
 								
 									// Text Input with Labels
-									echo "<td>".$row['labelA'].":</td><td><input type='text' name='qq".$row['id']."' value='".$row['labelC']."'></td>";
+									echo "<td>".$row['labelA'].":</td><td><input type='text' name='qq_".$row['id']."_".$row['questno']."' value='".$row['labelC']."'></td>";
 									
 									echo "</table></td>";
 							}

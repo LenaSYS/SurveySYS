@@ -55,7 +55,16 @@ session_start();
 	echo "<pre>";
 	print_r($_POST);
 	echo "</pre>\n";
-		
+
+	foreach($_POST as $key=>$val){
+			//echo $key;
+			if($key!='hash'){
+					$lst=explode("_",$key);
+					
+					echo "<pre>".$lst[1]." ".$lst[2]." ".$val."</pre>";
+			}
+	}	
+	
 ?>
 		
 </body>
