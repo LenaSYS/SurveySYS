@@ -138,6 +138,8 @@ session_start();
 							$error = $query->errorInfo();
 							$debug = "Error updating database: " . $error[2];
 					}
+			}else if($cmd="SWAP"){
+					echo "<pre>".print_r($_POST)."</pre>";
 			}
 		
 			// Retrieve full database and swizzle into associative array for each day
@@ -152,6 +154,7 @@ session_start();
 					echo "<tr><th>Rowno</th><th>Type</th><th>Labels (Left Right Center)</th><th>Description/Question</th></tr>";
 
 					$lastrow='UNK';
+					$lastno='UNK';
 					$rows = $query->fetchAll();	
 					foreach($rows as $row){
 								echo "<tr>";
@@ -196,8 +199,11 @@ session_start();
 								echo "<input type='hidden' name='CMD' value='SWAP'>";
 								if($lastrow!="UNK"){
 										echo "<input type='submit' value='Swap' >\n";
-										echo "<input type='hidden' name='Swap' value='".$lastrow."'>";
-										echo "<input type='hidden' name='SwapOut' value='".$row['id']."'>";									
+										echo "<input type='hidden' name='SwapId' value='".$row['id']."'>";
+										echo "<input type='hidden' name='SwapNo' value='".$row['questno']."'>";
+										echo "<input type='hidden' name='SwapOutId' value='".$lastrow."'>";
+										echo "<input type='hidden' name='SwapOutNo' value='".$lastno."'>";
+									
 								}
 								echo "</form></td>";
 
@@ -210,6 +216,7 @@ session_start();
 								echo "</tr>";
 						
 								$lastrow=$row['id'];
+								$lastno=$row['questno'];
 					}
 					echo "</table>";
 
