@@ -67,6 +67,14 @@ session_start();
 	$labelB=getOP('labelB');		
 	$labelC=getOP('labelC');
 	$type=getOP('type');
+	$id=getOP('id');
+		
+	$swapid=getOP('SwapId');
+	$swapno=getOP('SwapNo');		
+	$swapoutid=getOP('SwapOutId');
+	$swapoutno=getOP('SwapOutNo');		
+		
+	// Array ( [id] => 11 [CMD] => SWAP [SwapId] => 11 [SwapNo] => 8 [SwapOutId] => 10 [SwapOutNo] => 7 ) 
 		
 	$cmd=getOP('CMD');
 	$hash=getOP('hash');
@@ -120,6 +128,8 @@ session_start();
 			echo "<input type='submit' value='New Item' >\n";
 			echo "</form>\n";
 			echo "</div>\n";
+
+			print_r($_POST);
 		
 			if($cmd=="NEW"){
 					echo "MAKING NEW!!!";
@@ -138,8 +148,29 @@ session_start();
 							$error = $query->errorInfo();
 							$debug = "Error updating database: " . $error[2];
 					}
-			}else if($cmd="SWAP"){
-					echo "<pre>".print_r($_POST)."</pre>";
+			}else if($cmd=="SWAP"){
+					$query = $log_db->prepare('UPDATE item set questno=:questno where id=:id;');					
+					$query->bindParam(':id', $swapid);				
+					$query->bindParam(':questno', $swapoutno);
+					if (!$query->execute()) {
+							$error = $query->errorInfo();
+							$debug = "Error updating database: " . $error[2];
+					}
+					$query = $log_db->prepare('UPDATE item set questno=:questno where id=:id;');					
+					$query->bindParam(':id', $swapoutid);				
+					$query->bindParam(':questno', $swapno);
+					if (!$query->execute()) {
+							$error = $query->errorInfo();
+							$debug = "Error updating database: " . $error[2];
+					}				
+			}else if($cmd=="DEL"){
+					echo "DELETING!".$id;
+					$query = $log_db->prepare('DELETE FROM item WHERE id=:id;');					
+					$query->bindParam(':id', $id);				
+					if (!$query->execute()) {
+							$error = $query->errorInfo();
+							$debug = "Error updating database: " . $error[2];
+					}					
 			}
 		
 			// Retrieve full database and swizzle into associative array for each day
