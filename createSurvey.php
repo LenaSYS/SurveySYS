@@ -3,34 +3,24 @@
 session_start();
 ?>
 <html>
- 
 	<head>
-
 	<style>
-
 	body{
 			font-family: Arial Narrow,Arial,sans-serif; 
 			font-size:16px;
 	}
 		
-	#admincode {
-		
+	#admincode {		
 			border: 2px solid red;
 			border-radius: 6px;
 			margin: 8px;
-			padding: 8px;
-			
+			padding: 8px;			
 	}
-
 	</style>
-
 	<script>
 	</script>
-
 	</head>
-	
 	<body>
-		
 <?php			
 
 	date_default_timezone_set('Europe/Stockholm');
@@ -109,7 +99,7 @@ session_start();
 			echo "<form method='POST' name='editSurvey' action='createSurvey.php' >\n";
 			echo "<input type='hidden' name='CMD' value='NEW' >\n";
 			echo "<table>\n";
-			echo "<tr><td>Name:</td><td><input type='text' name='crename' value='New Survey Name' ></td></tr>\n";
+			echo "<tr><td>Name:</td><td><input type='text' name='crename' placeholder='New Survey Name' ></td></tr>\n";
 			echo "<tr><td>Description</td><td>";
 			echo "<textarea rows='8' cols='40' name='desc' >";
 			echo "</textarea>";
@@ -121,13 +111,13 @@ session_start();
 
 			// Make survvey administration form 
 			echo "<div id='admincode'>\n";
-			echo "Enter survey hash and administration code to edit survey.<br>";
-			echo "Please keep a copy of hash and administration code for future use, without these, it is not possible to edit the survey.";
+			echo "Enter survey hash and administration code to edit an existing survey.<br>";
+			echo "<em>Please keep a copy of hash and administration code for future use, without these, it is not possible to edit the survey.</em>";
 			echo "<form method='POST' name='editSurvey' action='editsurvey.php' >\n";
 			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
 			echo "<table>\n";
-			echo "<tr><td>Hash:</td><td><input type='text' value='Enter Hash' name='hash' ></td></tr>\n";
-			echo "<tr><td>Code:</td><td><input type='text' value='Admin Code' name='admincode' ></td></tr>\n";		
+			echo "<tr><td>Hash:</td><td><input type='text' placeholder='Enter Hash' name='hash' ></td></tr>\n";
+			echo "<tr><td>Code:</td><td><input type='text' placeholder='Admin Code' name='admincode' ></td></tr>\n";		
 			echo "</table>\n";
 			echo "<input type='submit' value='Edit Survey' >\n";
 			echo "</form>\n";
