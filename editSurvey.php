@@ -52,16 +52,6 @@ session_start();
 
 	//------------------------------------------------------------------------------------------------
 
-/*
-	echo "<pre>";
-	print_r($_POST);
-	echo "</pre>\n";
-		
-	echo "<pre>";
-	print_r($_SESSION);
-	echo "</pre>\n";		
-*/
-		
 	$description=getOP('description');
 	$labelA=getOP('labelA');
 	$labelB=getOP('labelB');		
@@ -73,9 +63,7 @@ session_start();
 	$swapno=getOP('SwapNo');		
 	$swapoutid=getOP('SwapOutId');
 	$swapoutno=getOP('SwapOutNo');		
-		
-	// Array ( [id] => 11 [CMD] => SWAP [SwapId] => 11 [SwapNo] => 8 [SwapOutId] => 10 [SwapOutNo] => 7 ) 
-		
+			
 	$cmd=getOP('CMD');
 	$hash=getOP('hash');
 	$admincode=getOP('admincode');
@@ -128,8 +116,6 @@ session_start();
 			echo "<input type='submit' value='New Item' >\n";
 			echo "</form>\n";
 			echo "</div>\n";
-
-			print_r($_POST);
 		
 			if($cmd=="NEW"){
 					echo "MAKING NEW!!!";
@@ -197,14 +183,7 @@ session_start();
                   $debug = "Error updating ".$update["column"].": \n\n\n" . $error[2];
               }					  
           }          
-/*
-					$query = $log_db->prepare('DELETE FROM item WHERE id=:id;');					
-					$query->bindParam(':id', $id);				
-					if (!$query->execute()) {
-							$error = $query->errorInfo();
-							$debug = "Error updating database: " . $error[2];
-					}					
-*/
+
 			}
 		
 			// Retrieve full database and swizzle into associative array for each day
@@ -216,7 +195,7 @@ session_start();
 			}else{
 				
 					echo "<table>";
-					echo "<tr><th>Rowno</th><th>Type</th><th>Labels (Left Right Center)</th><th>Description/Question</th></tr>";
+					echo "<tr><th>Prio</th><th>Type</th><th>Labels (Left Right Center)</th><th>Description/Question</th></tr>";
 
 					$lastrow='UNK';
 					$lastno='UNK';
@@ -226,9 +205,6 @@ session_start();
 								
 								// Number
 								echo "<td>".$row['questno']."</td>";
-
-								// Number
-								echo "<td>".$row['id']."</td>";						
 						
 								// Type
 								echo "<td style='border:1px solid red;border-radius:4px;'><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'><select name='type'>";

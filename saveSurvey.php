@@ -52,10 +52,10 @@ session_start();
 
 	//------------------------------------------------------------------------------------------------
 
-	echo "<pre>";
-	print_r($_POST);
-  echo "</pre>\n";
-  
+	$hash=getOP('hash');
+	$userhash=getOP('userhash');		
+	$useragent=$_SERVER['HTTP_USER_AGENT']." ".date('Y-m-d H:i:s',$_SERVER['REQUEST_TIME'])." ".$_SERVER['REMOTE_ADDR'];
+	  
   $log_db = new PDO('sqlite:./surveydata.db');
 	$sql = 'CREATE TABLE IF NOT EXISTS survey(id INTEGER PRIMARY KEY,hash varchar(32),name varchar(64), description TEXT, admincode varchar(10));';
 	$log_db->exec($sql);
@@ -68,17 +68,16 @@ session_start();
 
 	foreach($_POST as $key=>$val){
 			//echo $key;
-			if($key!='hash'){
+			if($key!='hash'&&$key!='userhash'){
 					$lst=explode("_",$key);
 					
-          echo "<pre>".$lst[1]." ".$lst[2]." ".$val."</pre>";
-          $query = $log_db->prepare('INSERT INTO response(hash,questno,itemid,val,useragent,userhash) VALUES (:hash,:questionno,:itemid,:val,:useragent,:userhash);');					
+          $query = $log_db->prepare('INSERT INTO response(hash,questno,itemid,val,useragent,userhash) VALUES (:hash,:questno,:itemid,:val,:useragent,:userhash);');					
 					$query->bindParam(':hash', $hash);
 					$query->bindParam(':questno', $lst[2]);				
 					$query->bindParam(':itemid', $lst[1]);
 					$query->bindParam(':val', $val);
-					$query->bindParam(':useragent', $lst[3]);
-					$query->bindParam(':userhash', $lst[4]);
+					$query->bindParam(':useragent', $useragent);
+					$query->bindParam(':userhash', $userhash);
 				
 					if (!$query->execute()) {
 							$error = $query->errorInfo();
@@ -87,7 +86,7 @@ session_start();
 			}
   }	
   
-
+	echo "<div style='border:2px dotted red;border-radius:6px;box-shadow:4px 4px 4px #000;'>Thank you for participating in this survey!</div>";
 	
 ?>
 		

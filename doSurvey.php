@@ -76,7 +76,7 @@
 				
 	$hash=getOPG('hash');
 
-	$log_db = new PDO('sqlite:./surveydata.db');
+  $log_db = new PDO('sqlite:./surveydata.db');
 	$sql = 'CREATE TABLE IF NOT EXISTS survey(id INTEGER PRIMARY KEY,hash varchar(32),name varchar(64), description TEXT, admincode varchar(10));';
 	$log_db->exec($sql);
 	$sql = 'CREATE TABLE IF NOT EXISTS item(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER,labelA text, labelB text, labelC text, description TEXT, type INTEGER);';		
@@ -87,6 +87,8 @@
 	$log_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 		
 	$datarow=Array();
+		
+	echo "GOO";
 
 	// Retrieve full database and swizzle into associative array for each day
 	$query=$log_db->prepare('SELECT * FROM survey where hash=:hash;');
@@ -96,6 +98,7 @@
 			print_r($error);
 	}else{
 			$rows = $query->fetchAll();	
+			print_r($_POST);
 			foreach($rows as $row){
 					$datarow=$row;
 			}

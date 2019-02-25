@@ -61,10 +61,6 @@ session_start();
 
 	//------------------------------------------------------------------------------------------------
 		
-	echo "<pre>";
-	print_r($_POST);
-	echo "</pre>\n";
-		
 	// Command
 	$cmd=getOP('CMD');
 
@@ -125,6 +121,8 @@ session_start();
 
 			// Make survvey administration form 
 			echo "<div id='admincode'>\n";
+			echo "Enter survey hash and administration code to edit survey.<br>";
+			echo "Please keep a copy of hash and administration code for future use, without these, it is not possible to edit the survey.";
 			echo "<form method='POST' name='editSurvey' action='editsurvey.php' >\n";
 			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
 			echo "<table>\n";
