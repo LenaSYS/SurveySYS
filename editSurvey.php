@@ -206,6 +206,90 @@ session_start();
               }					  
           }          
 
+			}else if($cmd=="EXPO"){
+				
+					$csv="";
+				
+					// Retrieve full database and swizzle into associative array for each day
+					$query=$log_db->prepare('SELECT * FROM item where hash=:hash order by questno');
+					$query->bindParam(':hash', $hash);
+					if (!$query->execute()) {
+							$error = $log_db->errorInfo();
+							print_r($error);
+					}else{
+							$labels=explode(",","A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,X,Y,Z,AA,AB,AC,AD,AE,AF,AG,AH,AI,AJ");
+							$i=1;
+							$rows = $query->fetchAll();	
+							foreach($rows as $row){
+																
+									// Any text-based response
+									$cquery=$log_db->prepare('SELECT * FROM response where hash=:hash and questno=:questno;');
+									$cquery->bindParam(':hash', $hash);
+									$cquery->bindParam(':questno', $row['questno']);
+									if (!$cquery->execute()) {
+											$error = $log_db->errorInfo();
+											print_r($error);
+									}else{
+											$crows = $cquery->fetchAll();	
+											
+											// Make headings
+											if($i==1){
+													$csv.="rowno";
+													$csv.=",questno";
+													$csv.=",description";
+
+													$j=0;
+													foreach($crows as $crow){
+															$j++;
+															$csv.=",resp".$j;
+													}
+
+													$csv.=",min";
+													$csv.=",max";
+													$csv.=",avg";
+												
+													$csv.="\\n";											
+											}
+
+											$csv.=$i.",";
+											$csv.=$row['questno'].",";
+											$csv.=$row['description'];
+										
+											foreach($crows as $crow){
+													$csv.=",".$crow['val'];
+											}
+										
+											$firstcol=3;
+											$lastcol=2+count($crows);
+
+											$i++;
+
+											// If it is a number add the max min average columns
+											if($row['type']==2){
+													$colS=$labels[$firstcol];
+													$colE=$labels[$lastcol];
+													$csv.= ","."=MIN(".$colS.$i.":".$colE.$i.")";												
+													$csv.= ","."=MAX(".$colS.$i.":".$colE.$i.")";																								
+													$csv.= ","."=AVERAGE(".$colS.$i.":".$colE.$i.")";
+											}
+
+									
+									}
+									
+									$csv.="\\n";
+							}
+					}					
+				
+					echo "<script>";
+					echo "var csvContent='".$csv."';";
+					echo "var encodedUri = 'data:text/csv;charset=utf-8,'+encodeURI(csvContent);";
+					echo "var link = document.createElement('a');";
+					echo "link.setAttribute('href', encodedUri);";
+					echo "link.setAttribute('download', 'my_data.csv');";
+					echo "document.body.appendChild(link);";
+					echo "link.click();";
+					// echo "alert(csvContent);";
+					echo "</script>";
 			}
 		
 			// Retrieve full database and swizzle into associative array for each day
@@ -215,6 +299,13 @@ session_start();
 					$error = $log_db->errorInfo();
 					print_r($error);
 			}else{
+				
+					// Export!
+					echo "<form method='post' action='editSurvey.php' >";
+					echo "<input type='hidden' name='hash' value='".$hash."'>";
+					echo "<input type='hidden' name='CMD' value='EXPO'>";
+					echo "<input type='submit' value='Export csv' >\n";
+					echo "</form></td>";
 				
 					echo "<table>";
 					echo "<tr><th>Prio</th><th>Type</th><th>Labels (Left Right Center)</th><th>Description/Question</th></tr>";
@@ -364,6 +455,8 @@ session_start();
           echo "</tfoot>";
           echo "</table>";
 			}
+		
+			
 			
 			
 			
