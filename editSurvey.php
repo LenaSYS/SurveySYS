@@ -175,15 +175,15 @@ session_start();
           echo "UPDATING".$id;
           $updateArr=array();
 					if($type!="UNK"){
-              echo "TYPE";
+              //echo "TYPE";
               array_push($updateArr,array("column"=>"type","value"=>$type));
 					}else if($labelA!="UNK"){
-              echo "LABL";	
+              //echo "LABL";	
               array_push($updateArr,array("column"=>"labelA","value"=>$labelA));
               array_push($updateArr,array("column"=>"labelB","value"=>$labelB));
               array_push($updateArr,array("column"=>"labelC","value"=>$labelC));
 					}else if($description!="UNK"){
-              echo "DESC";					
+              //echo "DESC";					
               array_push($updateArr,array("column"=>"description","value"=>$description));
           }
 
@@ -194,10 +194,9 @@ session_start();
               $query->bindParam(':value', $update["value"]);
               if (!$query->execute()) {
                   $error = $query->errorInfo();
-                  $debug = "Error updating database: " . $error[2];
+                  $debug = "Error updating ".$update["column"].": \n\n\n" . $error[2];
               }					  
-          }
-          
+          }          
 /*
 					$query = $log_db->prepare('DELETE FROM item WHERE id=:id;');					
 					$query->bindParam(':id', $id);				
