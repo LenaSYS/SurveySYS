@@ -135,7 +135,7 @@ session_start();
 					echo "MAKING NEW!!!";
 				
 					//$query = $log_db->prepare('INSERT INTO item(hash,description,type,labelA,labelB,labelC,questno) VALUES (:hash,:description,:type,:labelA,:labelB,:labelC,(select count(*) from item where hash=:hasho)+1)');
-					$query = $log_db->prepare('INSERT INTO item(hash,description,type,labelA,labelB,labelC,questno) VALUES (:hash,:description,:type,:labelA,:labelB,:labelC,(select count(*) from item where hash=:hasho)+1)');					
+					$query = $log_db->prepare('INSERT INTO item(hash,description,type,labelA,labelB,labelC,questno) VALUES (:hash,:description,:type,:labelA,:labelB,:labelC,IFNULL((select max(questno) from item where hash=:hasho)+1,1))');					
 					$query->bindParam(':hash', $hash);
 					$query->bindParam(':hasho', $hash);				
 					$query->bindParam(':labelA', $labelA);
@@ -171,6 +171,23 @@ session_start();
 							$error = $query->errorInfo();
 							$debug = "Error updating database: " . $error[2];
 					}					
+			}else if($cmd=="UPD"){
+					echo "UPDATING".$id;
+					if($type!="UNK"){
+							echo "TYPE";
+					}else if($labelA!="UNK"){
+							echo "LABL";					
+					}else if($desc!="UNK"){
+							echo "DESC";					
+					}
+/*
+					$query = $log_db->prepare('DELETE FROM item WHERE id=:id;');					
+					$query->bindParam(':id', $id);				
+					if (!$query->execute()) {
+							$error = $query->errorInfo();
+							$debug = "Error updating database: " . $error[2];
+					}					
+*/
 			}
 		
 			// Retrieve full database and swizzle into associative array for each day
@@ -192,7 +209,10 @@ session_start();
 								
 								// Number
 								echo "<td>".$row['questno']."</td>";
-								
+
+								// Number
+								echo "<td>".$row['id']."</td>";						
+						
 								// Type
 								echo "<td style='border:1px solid red;border-radius:4px;'><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'><select name='type'>";
 								if($row['type']==1){
@@ -205,7 +225,7 @@ session_start();
 										echo "Unknown type: ".$row['type'];
 								}
 								echo "</select>";
-								echo "<input type='hidden' name='CMD' value='UPDTYPE'>";
+								echo "<input type='hidden' name='CMD' value='UPD'>";
 								echo "<input type='submit' value='Save' >\n";
 								echo "</form></td>";
 
@@ -214,14 +234,14 @@ session_start();
 								echo "<input type='text' name='labelA' value='".$row['labelA']."' >";
 								echo "<input type='text' name='labelB' value='".$row['labelB']."' >";
 								echo "<input type='text' name='labelC' value='".$row['labelC']."' >";						
-								echo "<input type='hidden' name='CMD' value='UPDLABEL'>";
+								echo "<input type='hidden' name='CMD' value='UPD'>";
 								echo "<input type='submit' value='Save' >\n";
 								echo "</form></td>";
 						
 								// Description
 								echo "<td style='border:1px solid red;border-radius:4px;'><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'>";
 								echo "<textarea name='description' >".$row['description']."</textarea>";				
-								echo "<input type='hidden' name='CMD' value='UPDDESC'>";
+								echo "<input type='hidden' name='CMD' value='UPD'>";
 								echo "<input type='submit' value='Save' >\n";
 								echo "</form></td>";								
 
