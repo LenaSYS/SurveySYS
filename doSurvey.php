@@ -25,11 +25,34 @@
 	</style>
 
 	<script>
+		
+		function randomString(string_length) {
+				var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+				var randomstring = '';
+				for (var i=0; i<string_length; i++) {
+					var rnum = Math.floor(Math.random() * chars.length);
+					randomstring += chars.substring(rnum,rnum+1);
+				}
+				return randomstring;
+		}		
+		
+		function init()
+		{
+				var userhash=randomString(8);
+				if (localStorage.getItem("userhash") === null) {
+						localStorage.setItem("userhash", userhash);
+				}else{
+						userhash=localStorage.getItem("userhash");
+				}
+			
+				document.getElementById('userhash').value=userhash;
+		}
+		
 	</script>
 
 	</head>
 	
-	<body>
+	<body onload="init();">
 		
 <?php			
 
@@ -142,9 +165,10 @@
 					}
 				
 					echo "<tr><td><input type='submit' value='Save'></td></tr>";
-				
+
 					echo "</table>";
 				
+					echo "<input type='hidden' name='userhash' id='userhash' value=''>";
 					echo "<input type='hidden' name='hash' value='".$hash."'>";
 				
 					echo "</form>";
