@@ -14,19 +14,39 @@ session_start();
 			font-size:16px;
 	}
 		
-	#admincode {
-		
+	#admincode {		
 			border: 2px solid red;
 			border-radius: 6px;
 			margin: 8px;
-			padding: 8px;
-			
-	}
-		
+			padding: 8px;			
+	}		
 	form {
 			margin:0px;
 	}
 
+  .survey{
+      margin:auto;
+      padding:20px;
+      box-shadow:4px 4px 10px #000;
+      border-radius:6px;
+  }
+
+  .survey table {
+      margin:auto;
+  }
+
+  .survey > tbody > tr:nth-child(odd){
+      background-color:#fafafa;
+  }
+  .survey > tbody > tr:nth-child(even){
+      background-color:#afafaf;
+  }
+
+  .survey > tfoot {
+      font-size:10;
+      text-align:right;
+      color:rgba(0,0,0,0.5);
+  }
 	</style>
 
 	<script>
@@ -90,7 +110,7 @@ session_start();
 			$error = $log_db->errorInfo();
 			print_r($error);
 	}else{
-			$rows = $query->fetchAll();	
+			$rows = $query->fetchAll(PDO::FETCH_ASSOC);	
 			foreach($rows as $row){
 					$datarow=$row;
 			}
@@ -101,7 +121,9 @@ session_start();
 			echo "Survey: ".$hash."<br>";
 		
 			$_SESSION['hash']=$hash;
-			$_SESSION['admincode']=$admincode;
+      $_SESSION['admincode']=$admincode;
+      $_SESSION['surveyname']=$datarow["name"];
+      $_SESSION['surveydescription']=$datarow["description"];
 
 			echo "<div id='admincode'>\n";
 			echo "<form method='POST' name='editSurvey' action='editsurvey.php' >\n";
@@ -267,12 +289,25 @@ session_start();
 					echo "<h3>Preview</h3>";	
 				
 					// Preview
-					echo "<table>";
-	
-					foreach($rows as $row){
-							echo "<tr>";
+          echo "<table class='survey'>";
+          //echo "<caption>".$_SESSION['surveyname']."</caption>";
+          echo "<thead>";
+          echo "<tr>";
+          echo "<th>";
+          echo $_SESSION['surveyname'];
+          echo "</th>";
+          echo "</tr>";
+          echo "<tr>";
+          echo "<th>";
+          echo $_SESSION['surveydescription'];
+          echo "</th>";
+          echo "</tr>";
+          echo "</thead>";
+          echo "<tbody>";
+					foreach($rows as $row){              
 							if($row['type']==2){
-									echo "<td>";
+                  echo "<tr>";
+                  echo "<td>";
 									echo "<table>";
 									
 									// Question / Description
@@ -294,8 +329,10 @@ session_start();
 								
 									echo "</table>";
 									echo "</td>";
-							}else if($row['type']==3){
-									echo "<td><table>";
+                  echo "</tr>";
+                }else if($row['type']==3){
+                  echo "<tr>";
+                  echo "<td><table>";
 
 									// Question / Description
 									echo "<tr><td colspan='2'>".$row['description']."</td></tr>";
@@ -304,11 +341,28 @@ session_start();
 									echo "<td>".$row['labelA'].":</td><td><input type='text' name='qq_".$row['id']."_".$row['questno']."' value='".$row['labelC']."'></td>";
 									
 									echo "</table></td>";
-							}
-							echo "</tr><tr></tr>";
+                  echo "</tr>";
+                }else if($row['type']==1){
+                  echo "<tr>";
+                  echo "<td><table>";
+
+									// URL
+									echo "<tr><td colspan='2'>Visit <a href='".$row['description']."' target='_blank'>".$row['description']."</a> and answer the questions below.</td></tr>";
+																	
+									echo "</table></td>";
+                  echo "</tr>";
+                }
 					}
-				
-					echo "</table>";
+          echo "</tbody>";
+          echo "<tfoot>";
+          echo "<tr>";
+          echo "<th>";
+          $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+          echo "Survey URL: <a href='".$actual_link."?hash=".$hash."'>".$actual_link."?hash=".$hash."</a>";
+          echo "</th>";
+          echo "</tr>";
+          echo "</tfoot>";
+          echo "</table>";
 			}
 			
 			
