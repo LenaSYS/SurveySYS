@@ -206,9 +206,10 @@ session_start();
               }					  
           }          
 
-			}else if($cmd=="EXPO"){
+			}else if($cmd=="EXPO"||$cmd=="EXPOSVG"){
 				
 					$csv="";
+					$svgarr=Array();
 				
 					// Retrieve full database and swizzle into associative array for each day
 					$query=$log_db->prepare('SELECT * FROM item where hash=:hash order by questno');
@@ -259,17 +260,30 @@ session_start();
 											$csv.=$row['questno'].",";
 											$csv.=$row['description'];
 										
+											$max=0;
+											$min=10000;
+											$avg=0;
+										
 											foreach($crows as $crow){
+													if($max<floatval($crow['val'])) $max=floatval($crow['val']);
+													if($min>floatval($crow['val'])) $min=floatval($crow['val']);
+													$avg+=(floatval($crow['val'])/count($crows));
 													$csv.=",".$crow['val'];
 											}
-										
+
 											$firstcol=3;
 											$lastcol=2+count($crows);
 
 											$i++;
 
 											// If it is a number add the max min average columns
-											if($row['type']==2){
+											if(($row['type']==2)&&(count($crows)>0)){
+													array_push($svgarr,$row['description']);
+													array_push($svgarr,$row['questno']);
+													array_push($svgarr,$avg);
+													array_push($svgarr,$min);
+													array_push($svgarr,$max);	
+													
 													$colS=$labels[$firstcol];
 													$colE=$labels[$lastcol];
 													$csv.= ","."=MIN(".$colS.$i.":".$colE.$i.")";												
@@ -284,16 +298,98 @@ session_start();
 							}
 					}					
 				
-					echo "<script>";
-					echo "var csvContent='".$csv."';";
-					echo "var encodedUri = 'data:text/csv;charset=utf-8,'+encodeURI(csvContent);";
-					echo "var link = document.createElement('a');";
-					echo "link.setAttribute('href', encodedUri);";
-					echo "link.setAttribute('download', 'my_data.csv');";
-					echo "document.body.appendChild(link);";
-					echo "link.click();";
-					// echo "alert(csvContent);";
-					echo "</script>";
+					if($cmd=="EXPO"){
+							echo "<script>";
+							echo "var csvContent='".$csv."';";
+							echo "var encodedUri = 'data:text/csv;charset=utf-8,'+encodeURI(csvContent);";
+							echo "var link = document.createElement('a');";
+							echo "link.setAttribute('href', encodedUri);";
+							echo "link.setAttribute('download', 'my_data.csv');";
+							echo "document.body.appendChild(link);";
+							echo "link.click();";
+							echo "</script>";
+					}else if($cmd=="EXPOSVG"){
+							$cnt=count($svgarr)/5;
+							$chartwidth=($cnt*50)+100;
+							$svg="<svg viewBox='0 0 ".$chartwidth." 450' xmlns='http://www.w3.org/2000/svg'>";
+							
+							for($i=0;$i<$cnt;$i++){
+									if(($i%2)==0){
+											$svg.="<rect x='".(($i*50)+50)."' y='60' width='50' height='340' fill='rgb(255,225,255)' />";
+									}else{
+											$svg.="<rect x='".(($i*50)+50)."' y='60' width='50' height='340' fill='rgb(255,225,225)' />";
+									}
+							}
+							
+							for($i=0;$i<7;$i++){
+									$svg.="<line x1='45' y1='".(($i*50)+75)."' x2='55' y2='".(($i*50)+75)."' stroke='rgb(0,0,0)' strokewidth='2' />";							
+									$svg.="<text x='35' y='".(($i*50)+80)."' fill='rgb(0,0,0)' fontfamily='Arial' font-size='12' text-anchor='left' dominant-baseline='central' >".(7-$i)."</text>";							
+							}
+
+							$svg.="<line x1='50' y1='50' x2='50' y2='400' stroke='rgb(0,0,0)' strokewidth='2' />";
+							$svg.="<line x1='50' y1='400' x2='".$chartwidth."' y2='400' stroke='rgb(0,0,0)' strokewidth='2' />";
+
+							$pnt="";
+							$iv="";
+						
+							$kumho=425;
+						
+							$circ="";
+						
+							for($i=0;$i<$cnt;$i++){
+										$val=floatval($svgarr[($i*5)+2]);
+										$minval=floatval($svgarr[($i*5)+3]);
+										$maxval=floatval($svgarr[($i*5)+4]);
+										if($i==0) $pnt.=(($i*50)+50).",".($kumho-($val*50));
+										if($i==0) $iv.=(($i*50)+50).",".($kumho-($minval*50));								
+
+										$circ.="<circle cx='".(($i*50)+75)."' cy='".($kumho-($val*50))."' r='4' fill='green'/>";
+										$circ.="<text x='".(($i*50)+75)."' y='".($kumho-($val*50)-10)."' fill='black' text-anchor='middle' >".$val."</text>";
+								
+										$pnt.=",".(($i*50)+75).",".($kumho-($val*50));
+										$iv.=",".(($i*50)+75).",".($kumho-($minval*50));
+							}
+							if($cnt>0){
+										$pnt.=",".(($i*50)+50).",".($kumho-($val*50));								
+										$iv.=",".(($i*50)+50).",".($kumho-($minval*50));	
+										$iv.=",".(($i*50)+50).",".($kumho-($maxval*50));									
+							}
+							$i--;
+							for(;$i>=0;$i--){
+										$maxval=floatval($svgarr[($i*5)+4]);
+										$iv.=",".(($i*50)+75).",".($kumho-($maxval*50));
+							}
+							if($cnt>0){
+										$maxval=$svgarr[4];
+										$iv.=",".(($i*50)+100).",".($kumho-($maxval*50));									
+							}
+						
+							$svg.="<polyline points='".$iv."' stroke='none' fill='lightblue' stroke-width='3' opacity='0.4' />";							
+							$svg.="<polyline points='".$pnt."' stroke='green' fill='none' stroke-width='3' />";
+						
+							$svg.=$circ;	
+						
+							for($i=0;$i<$cnt;$i++){
+									$svg.="<text textLength='20' x='".(($i*50)+75)."' y='410' fill='rgb(0,0,0)' transform='rotate(45 ".(($i*50)+75)." 410)' fontfamily='Arial' font-size='10' text-anchor='left' dominant-baseline='central' >".substr($svgarr[($i*5)],0,12)."</text>";
+							}
+						
+							$svg.="<polyline points='47,50,53,50,50,42' stroke='none' fill='black' stroke-width='3' />";
+							$svg.="<polyline points='".$chartwidth.",397,".$chartwidth.",403,".($chartwidth+8).",400' stroke='none' fill='black' stroke-width='3' />";						
+						
+							$svg.="</svg>";
+
+							echo "<script>";
+							echo "var svgContent=\"".$svg."\";";
+							echo "var encodedUri = 'data:text/svg;charset=utf-8,'+encodeURI(svgContent);";
+							echo "var link = document.createElement('a');";
+							echo "link.setAttribute('href', encodedUri);";
+							echo "link.setAttribute('download', 'my_data.svg');";
+							echo "document.body.appendChild(link);";
+							echo "link.click();";
+							echo "</script>";
+					
+					}
+				
 			}
 		
 			// Retrieve full database and swizzle into associative array for each day
@@ -309,7 +405,14 @@ session_start();
 					echo "<input type='hidden' name='hash' value='".$hash."'>";
 					echo "<input type='hidden' name='CMD' value='EXPO'>";
 					echo "<input type='submit' value='Export csv' >\n";
-					echo "</form></td>";
+					echo "</form>";
+
+					// Export!
+					echo "<form method='post' action='editSurvey.php' >";
+					echo "<input type='hidden' name='hash' value='".$hash."'>";
+					echo "<input type='hidden' name='CMD' value='EXPOSVG'>";
+					echo "<input type='submit' value='Export svg' >\n";
+					echo "</form>";
 				
 					echo "<table>";
 					echo "<tr><th>Prio</th><th>Type</th><th>Labels (Left Right Center)</th><th>Description/Question</th></tr>";
