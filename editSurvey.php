@@ -443,10 +443,22 @@ session_start();
 								echo "</form></td>";
 
 								// Labels
-								echo "<td style='border:1px solid red;border-radius:4px;'><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'>";
-								echo "<input type='text' name='labelA' value='".$row['labelA']."' >";
-								echo "<input type='text' name='labelB' value='".$row['labelB']."' >";
-								echo "<input type='text' name='labelC' value='".$row['labelC']."' >";						
+                echo "<td style='border:1px solid red;border-radius:4px;'><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='".$row['id']."'>";
+                if($row['type']==1){
+                    echo "<input type='text' name='labelA' value='".$row['labelA']."' placeholder='Before link'>";
+                    echo "<input type='text' name='labelB' value='".$row['labelB']."' placeholder='After link'>";
+                    echo "<input type='hidden' name='labelC' value='".$row['labelC']."' >";						
+              }else if($row['type']==2){
+                    echo "<input type='text' name='labelA' value='".$row['labelA']."' placeholder='Left'>";
+                    echo "<input type='text' name='labelB' value='".$row['labelB']."' placeholder='Right'>";
+                    echo "<input type='text' name='labelC' value='".$row['labelC']."' placeholder='Center'>";						  
+                }else if($row['type']==3){
+                    echo "<input type='text' name='labelA' value='".$row['labelA']."' placeholder='Label'>";
+                    echo "<input type='hidden' name='labelB' value='".$row['labelB']."'>";
+                    echo "<input type='hidden' name='labelC' value='".$row['labelC']."'>";						  
+                }else{
+                  echo "Unknown type: ".$row['type'];
+                }                    
 								echo "<input type='hidden' name='CMD' value='UPD'>";
 								echo "<input type='submit' value='Save' >\n";
 								echo "</form></td>";
@@ -545,7 +557,7 @@ session_start();
                   echo "<td><table>";
 
 									// URL
-									echo "<tr><td colspan='2'>Visit <a href='".$row['description']."' target='_blank'>".$row['description']."</a> and answer the questions below.</td></tr>";
+									echo "<tr><td colspan='2'>".$row['labelA']." <a href='".$row['description']."' target='_blank'>".$row['description']."</a> ".$row['labelB']."</td></tr>";
 																	
 									echo "</table></td>";
                   echo "</tr>";
