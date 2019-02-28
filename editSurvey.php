@@ -61,6 +61,44 @@ session_start();
 	date_default_timezone_set('Europe/Stockholm');
 
 	//------------------------------------------------------------------------------------------------
+	// stats_standard_deviation
+	//------------------------------------------------------------------------------------------------
+	
+	if (!function_exists('stats_standard_deviation')) {
+			/**
+			 * This user-land implementation follows the implementation quite strictly;
+			 * it does not attempt to improve the code or algorithm in any way. It will
+			 * raise a warning if you have fewer than 2 values in your array, just like
+			 * the extension does (although as an E_USER_WARNING, not E_WARNING).
+			 *
+			 * @param array $a
+			 * @param bool $sample [optional] Defaults to false
+			 * @return float|bool The standard deviation or false on error.
+			 */
+			function stats_standard_deviation(array $a, $sample = false) {
+					$n = count($a);
+					if ($n === 0) {
+							trigger_error("The array has zero elements", E_USER_WARNING);
+							return false;
+					}
+					if ($sample && $n === 1) {
+							trigger_error("The array has only 1 element", E_USER_WARNING);
+							return false;
+					}
+					$mean = array_sum($a) / $n;
+					$carry = 0.0;
+					foreach ($a as $val) {
+							$d = ((double) $val) - $mean;
+							$carry += $d * $d;
+					};
+					if ($sample) {
+						 --$n;
+					}
+					return sqrt($carry / $n);
+			}
+	}		
+		
+	//------------------------------------------------------------------------------------------------
 	// getOP
 	//------------------------------------------------------------------------------------------------
 
@@ -264,11 +302,19 @@ session_start();
 											$min=10000;
 											$avg=0;
 										
+											$statitems=Array();
+											
 											foreach($crows as $crow){
 													if($max<floatval($crow['val'])) $max=floatval($crow['val']);
 													if($min>floatval($crow['val'])) $min=floatval($crow['val']);
 													$avg+=(floatval($crow['val'])/count($crows));
 													$csv.=",".$crow['val'];
+													array_push($statitems,floatval($crow['val']);
+											}
+											
+											$stdev=0;
+											if($count($crows)>1){
+													$stdev=stats_standard_deviation($statitems);
 											}
 
 											$firstcol=3;
@@ -282,7 +328,8 @@ session_start();
 													array_push($svgarr,$row['questno']);
 													array_push($svgarr,$avg);
 													array_push($svgarr,$min);
-													array_push($svgarr,$max);	
+													array_push($svgarr,$max);
+													// array_push($svgarr,$stdev);
 													
 													$colS=$labels[$firstcol];
 													$colE=$labels[$lastcol];
@@ -336,10 +383,13 @@ session_start();
 						
 							$circ="";
 						
+							$itemcnt=5;
+						
 							for($i=0;$i<$cnt;$i++){
-										$val=floatval($svgarr[($i*5)+2]);
-										$minval=floatval($svgarr[($i*5)+3]);
-										$maxval=floatval($svgarr[($i*5)+4]);
+										$val=floatval($svgarr[($i*$itemcnt)+2]);
+										$minval=floatval($svgarr[($i*$itemcnt)+3]);
+										$maxval=floatval($svgarr[($i*$itemcnt)+4]);
+										// $stdev=floatval($svgarr[($i*5)+5]);
 										if($i==0) $pnt.=(($i*50)+50).",".($kumho-($val*50));
 										if($i==0) $iv.=(($i*50)+50).",".($kumho-($minval*50));								
 
@@ -356,7 +406,7 @@ session_start();
 							}
 							$i--;
 							for(;$i>=0;$i--){
-										$maxval=floatval($svgarr[($i*5)+4]);
+										$maxval=floatval($svgarr[($i*$itemcnt)+4]);
 										$iv.=",".(($i*50)+75).",".($kumho-($maxval*50));
 							}
 							if($cnt>0){
