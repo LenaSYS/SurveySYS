@@ -113,7 +113,7 @@ session_start();
 	$description=getOP('description');
 	$labelA=getOP('labelA');
 	$labelB=getOP('labelB');		
-	$labelC=getOP('labelC');
+  $labelC=getOP('labelC');
 	$type=getOP('type');
 	$id=getOP('id');
 		
@@ -164,7 +164,7 @@ session_start();
       $_SESSION['surveydescription']=$datarow["description"];
 
 			echo "<div id='admincode'>\n";
-			echo "<form method='POST' name='editSurvey' action='editsurvey.php' >\n";
+			echo "<form method='POST' name='editSurvey' action='editSurvey.php' >\n";
 			echo "<input type='hidden' name='CMD' value='NEW' >\n";
 			echo "<table>\n";
 			echo "<tr><td>Type:</td><td><select name='type'><option value='1'>Link</option><option value='2'>Number</option><option value='3'>Text</option></select></td></tr>\n";		
@@ -244,7 +244,18 @@ session_start();
               }					  
           }          
 
-			}else if($cmd=="EXPO"||$cmd=="EXPOSVG"){
+			}else if($cmd=="UPDDESC"){
+          echo "UPDATING DESCRIPTION FOR ".$id;
+          
+          $sql='UPDATE survey SET description=:desc WHERE hash=:hash;';
+          $query = $log_db->prepare($sql);					
+          $query->bindParam(':hash', $hash);
+          $query->bindParam(':desc', $description);
+          if (!$query->execute()) {
+              $error = $query->errorInfo();
+              $debug = "Error updating ".$update["column"].": \n\n\n" . $error[2];
+          }	          
+      }else if($cmd=="EXPO"||$cmd=="EXPOSVG"){
 				
 					$csv="";
 					$svgarr=Array();
@@ -463,8 +474,16 @@ session_start();
 					echo "<input type='hidden' name='CMD' value='EXPOSVG'>";
 					echo "<input type='submit' value='Export svg' >\n";
 					echo "</form>";
-				
-					echo "<table>";
+        
+          echo "<form method='post' action='editSurvey.php' >";
+          echo "<input type='hidden' name='hash' value='".$hash."'>";
+          echo "<input type='hidden' name='id' value='".$id."'>";
+          echo "<input type='hidden' name='CMD' value='UPDDESC'>";
+          echo "<input type='text' name='description' value=''>";
+					echo "<input type='submit' value='Update Description' >\n";
+					echo "</form>";
+          echo "<table>";
+          
 					echo "<tr><th>Prio</th><th>Type</th><th>Labels (Left Right Center)</th><th>Description/Question</th></tr>";
 
 					$lastrow='UNK';
@@ -618,6 +637,8 @@ session_start();
           echo "<tr>";
           echo "<th>";
           $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+          $actual_link=explode("?",$actual_link)[0];
+          $actual_link=str_replace("editSurvey.php","doSurvey.php",$actual_link);
           echo "Survey URL: <a href='".$actual_link."?hash=".$hash."'>".$actual_link."?hash=".$hash."</a>";
           echo "</th>";
           echo "</tr>";
@@ -632,11 +653,11 @@ session_start();
 	}else{
 			// Make survvey administration form 
 			echo "<div id='admincode'>\n";
-			echo "<form method='POST' name='editSurvey' action='editsurvey.php' >\n";
+			echo "<form method='POST' name='editSurvey' action='editSurvey.php' >\n";
 			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
 			echo "<table>\n";
-			echo "<tr><td>Hash:</td><td><input type='text' value='Enter Hash' name='hash' ></td></tr>\n";
-			echo "<tr><td>Code:</td><td><input type='text' value='Admin Code' name='admincode' ></td></tr>\n";		
+			echo "<tr><td>Hash:</td><td><input type='text' placeholder='Enter Hash' name='hash' ></td></tr>\n";
+			echo "<tr><td>Code:</td><td><input type='text' placeholder='Admin Code' name='admincode' ></td></tr>\n";		
 			echo "</table>\n";
 			echo "<input type='submit' value='Edit Survey' >\n";
 			echo "</form>\n";
