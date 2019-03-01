@@ -113,7 +113,7 @@ session_start();
 			echo "<div id='admincode'>\n";
 			echo "Enter survey hash and administration code to edit an existing survey.<br>";
 			echo "<em>Please keep a copy of hash and administration code for future use, without these, it is not possible to edit the survey.</em>";
-			echo "<form method='POST' name='editSurvey' action='editsurvey.php' >\n";
+			echo "<form method='POST' name='editSurvey' action='editSurvey.php' >\n";
 			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
 			echo "<table>\n";
 			echo "<tr><td>Hash:</td><td><input type='text' placeholder='Enter Hash' name='hash' ></td></tr>\n";
