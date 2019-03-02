@@ -132,6 +132,13 @@ session_start();
 	$log_db->exec($sql);	
 	$sql = 'CREATE TABLE IF NOT EXISTS response(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER, itemid INTEGER, val TEXT, useragent TEXT, userhash varchar(32));';		
 	$log_db->exec($sql);	
+		
+	if($cmd=="LOGOFF"){
+				session_unset();
+				session_destroy();
+				$_SESSION=Array();
+				$hash="KUMHO";
+	}
 
 	$log_db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 		
@@ -484,12 +491,18 @@ session_start();
 					echo "<input type='hidden' name='CMD' value='EXPOSVG'>";
 					echo "<input type='submit' value='Export svg' >\n";
 					echo "</form>";
+				
+					// Logoff
+					echo "<form method='post' action='editSurvey.php' >";
+					echo "<input type='hidden' name='CMD' value='LOGOFF'>";
+					echo "<input type='submit' value='Logoff' >\n";
+					echo "</form>";				
         
           echo "<form method='post' action='editSurvey.php' >";
           echo "<input type='hidden' name='hash' value='".$hash."'>";
           echo "<input type='hidden' name='id' value='".$id."'>";
           echo "<input type='hidden' name='CMD' value='UPDDESC'>";
-          echo "<input type='text' name='description' value=''>";
+          echo "<input type='text' name='description' value='".$datarow['description']."'>";
 					echo "<input type='submit' value='Update Description' >\n";
 					echo "</form>";
           echo "<table>";
