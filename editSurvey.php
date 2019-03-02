@@ -63,41 +63,38 @@ session_start();
 	//------------------------------------------------------------------------------------------------
 	// stats_standard_deviation
 	//------------------------------------------------------------------------------------------------
-	
-	if (!function_exists('stats_standard_deviation')) {
-			/**
-			 * This user-land implementation follows the implementation quite strictly;
-			 * it does not attempt to improve the code or algorithm in any way. It will
-			 * raise a warning if you have fewer than 2 values in your array, just like
-			 * the extension does (although as an E_USER_WARNING, not E_WARNING).
-			 *
-			 * @param array $a
-			 * @param bool $sample [optional] Defaults to false
-			 * @return float|bool The standard deviation or false on error.
-			 */
-			function stats_standard_deviation(array $a, $sample = false) {
-					$n = count($a);
-					if ($n === 0) {
-							trigger_error("The array has zero elements", E_USER_WARNING);
-							return false;
-					}
-					if ($sample && $n === 1) {
-							trigger_error("The array has only 1 element", E_USER_WARNING);
-							return false;
-					}
-					$mean = array_sum($a) / $n;
-					$carry = 0.0;
-					foreach ($a as $val) {
-							$d = ((double) $val) - $mean;
-							$carry += $d * $d;
-					};
-					if ($sample) {
-						 --$n;
-					}
-					return sqrt($carry / $n);
+	/**
+	* This user-land implementation follows the implementation quite strictly;
+	* it does not attempt to improve the code or algorithm in any way. It will
+	* raise a warning if you have fewer than 2 values in your array, just like
+	* the extension does (although as an E_USER_WARNING, not E_WARNING).
+	*
+	* @param array $a
+	* @param bool $sample [optional] Defaults to false
+	* @return float|bool The standard deviation or false on error.
+	*/
+	function stats_standard_deviation(array $a, $sample = false) {
+			$n = count($a);
+			if ($n === 0) {
+					trigger_error("The array has zero elements", E_USER_WARNING);
+					return false;
 			}
-	}		
-		
+			if ($sample && $n === 1) {
+					trigger_error("The array has only 1 element", E_USER_WARNING);
+					return false;
+			}
+			$mean = array_sum($a) / $n;
+			$carry = 0.0;
+			foreach ($a as $val) {
+					$d = ((double) $val) - $mean;
+					$carry += $d * $d;
+			};
+			if ($sample) {
+				 --$n;
+			}
+			return sqrt($carry / $n);
+	}
+
 	//------------------------------------------------------------------------------------------------
 	// getOP
 	//------------------------------------------------------------------------------------------------
@@ -320,11 +317,11 @@ session_start();
 													if($min>floatval($crow['val'])) $min=floatval($crow['val']);
 													$avg+=(floatval($crow['val'])/count($crows));
 													$csv.=",".$crow['val'];
-													array_push($statitems,floatval($crow['val']);
+													array_push($statitems,floatval($crow['val']));
 											}
 											
 											$stdev=0;
-											if($count($crows)>1){
+											if(count($crows)>1){
 													$stdev=stats_standard_deviation($statitems);
 											}
 
@@ -335,12 +332,15 @@ session_start();
 
 											// If it is a number add the max min average columns
 											if(($row['type']==2)&&(count($crows)>0)){
-													array_push($svgarr,$row['description']);
-													array_push($svgarr,$row['questno']);
-													array_push($svgarr,$avg);
-													array_push($svgarr,$min);
-													array_push($svgarr,$max);
-													// array_push($svgarr,$stdev);
+													
+													$theitem=Array();
+													array_push($theitem,$row['description']);
+													array_push($theitem,$row['questno']);
+													array_push($theitem,$avg);
+													array_push($theitem,$min);
+													array_push($theitem,$max);
+													array_push($theitem,$stdev);
+													array_push($svgarr,$theitem);												
 													
 													$colS=$labels[$firstcol];
 													$colE=$labels[$lastcol];
@@ -367,7 +367,7 @@ session_start();
 							echo "link.click();";
 							echo "</script>";
 					}else if($cmd=="EXPOSVG"){
-							$cnt=count($svgarr)/5;
+							$cnt=count($svgarr);
 							$chartwidth=($cnt*50)+100;
 							$svg="<svg viewBox='0 0 ".$chartwidth." 450' xmlns='http://www.w3.org/2000/svg'>";
 							
@@ -389,49 +389,59 @@ session_start();
 
 							$pnt="";
 							$iv="";
+							$stv="";
 						
 							$kumho=425;
 						
 							$circ="";
 						
-							$itemcnt=5;
-						
 							for($i=0;$i<$cnt;$i++){
-										$val=floatval($svgarr[($i*$itemcnt)+2]);
-										$minval=floatval($svgarr[($i*$itemcnt)+3]);
-										$maxval=floatval($svgarr[($i*$itemcnt)+4]);
-										// $stdev=floatval($svgarr[($i*5)+5]);
+										$val=floatval($svgarr[$i][2]);
+										$minval=floatval($svgarr[$i][3]);
+										$maxval=floatval($svgarr[$i][4]);
+										$stdev=floatval($svgarr[$i][5]);
 										if($i==0) $pnt.=(($i*50)+50).",".($kumho-($val*50));
-										if($i==0) $iv.=(($i*50)+50).",".($kumho-($minval*50));								
+										if($i==0) $iv.=(($i*50)+50).",".($kumho-($minval*50));
+										if($i==0) $stv.=(($i*50)+50).",".($kumho-(($val*50)-($stdev*50)));										
 
 										$circ.="<circle cx='".(($i*50)+75)."' cy='".($kumho-($val*50))."' r='4' fill='green'/>";
-										$circ.="<text x='".(($i*50)+75)."' y='".($kumho-($val*50)-10)."' fill='black' text-anchor='middle' >".$val."</text>";
+										$circ.="<text x='".(($i*50)+75)."' y='".($kumho-($val*50)-10)."' fill='black' text-anchor='middle' >".round($val,1)."</text>";
 								
 										$pnt.=",".(($i*50)+75).",".($kumho-($val*50));
 										$iv.=",".(($i*50)+75).",".($kumho-($minval*50));
+										$stv.=",".(($i*50)+75).",".($kumho-(($val*50)-($stdev*50)));
 							}
 							if($cnt>0){
 										$pnt.=",".(($i*50)+50).",".($kumho-($val*50));								
-										$iv.=",".(($i*50)+50).",".($kumho-($minval*50));	
-										$iv.=",".(($i*50)+50).",".($kumho-($maxval*50));									
+										$iv.=",".(($i*50)+50).",".($kumho-($minval*50));
+										$iv.=",".(($i*50)+50).",".($kumho-($maxval*50));
+										$stv.=",".(($i*50)+50).",".($kumho-(($val*50)-($stdev*50)));								
+										$stv.=",".(($i*50)+50).",".($kumho-(($val*50)+($stdev*50)));									
 							}
 							$i--;
 							for(;$i>=0;$i--){
-										$maxval=floatval($svgarr[($i*$itemcnt)+4]);
+										$maxval=floatval($svgarr[$i][4]);
+										$val=floatval($svgarr[$i][2]);
+										$stdev=floatval($svgarr[$i][5]);	
 										$iv.=",".(($i*50)+75).",".($kumho-($maxval*50));
+										$stv.=",".(($i*50)+75).",".($kumho-(($val*50)+($stdev*50)));
 							}
 							if($cnt>0){
-										$maxval=$svgarr[4];
-										$iv.=",".(($i*50)+100).",".($kumho-($maxval*50));									
+										$maxval=floatval($svgarr[0][4]);
+										$val=floatval($svgarr[0][2]);
+										$stdev=floatval($svgarr[0][5]);
+										$iv.=",".(($i*50)+100).",".($kumho-($maxval*50));
+										$stv.=",".(($i*50)+100).",".($kumho-(($val*50)+($stdev*50)));								
 							}
 						
 							$svg.="<polyline points='".$iv."' stroke='none' fill='lightblue' stroke-width='3' opacity='0.4' />";							
+							$svg.="<polyline points='".$stv."' stroke='none' fill='darkblue' stroke-width='3' opacity='0.1' />";																																	 
 							$svg.="<polyline points='".$pnt."' stroke='green' fill='none' stroke-width='3' />";
 						
 							$svg.=$circ;	
 						
 							for($i=0;$i<$cnt;$i++){
-									$svg.="<text textLength='20' x='".(($i*50)+75)."' y='410' fill='rgb(0,0,0)' transform='rotate(45 ".(($i*50)+75)." 410)' fontfamily='Arial' font-size='10' text-anchor='left' dominant-baseline='central' >".substr($svgarr[($i*5)],0,12)."</text>";
+									$svg.="<text textLength='20' x='".(($i*50)+75)."' y='410' fill='rgb(0,0,0)' transform='rotate(45 ".(($i*50)+75)." 410)' fontfamily='Arial' font-size='10' text-anchor='left' dominant-baseline='central' >".substr($svgarr[$i][0],0,12)."</text>";
 							}
 						
 							$svg.="<polyline points='47,50,53,50,50,42' stroke='none' fill='black' stroke-width='3' />";
