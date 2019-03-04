@@ -362,9 +362,10 @@ session_start();
 									$csv.="\\n";
 							}
 					}					
-				
+        
+          $csv=str_replace("'","",$csv);
 					if($cmd=="EXPO"){
-							echo "<script>";
+              echo "<script>";
 							echo "var csvContent='".$csv."';";
 							echo "var encodedUri = 'data:text/csv;charset=utf-8,'+encodeURI(csvContent);";
 							echo "var link = document.createElement('a');";
@@ -376,13 +377,13 @@ session_start();
 					}else if($cmd=="EXPOSVG"){
 							$cnt=count($svgarr);
 							$chartwidth=($cnt*50)+100;
-							$svg="<svg viewBox='0 0 ".$chartwidth." 450' xmlns='http://www.w3.org/2000/svg'>";
+							$svg="<svg viewBox='0 0 ".$chartwidth." 600' xmlns='http://www.w3.org/2000/svg'>";
 							
 							for($i=0;$i<$cnt;$i++){
 									if(($i%2)==0){
-											$svg.="<rect x='".(($i*50)+50)."' y='60' width='50' height='340' fill='rgb(255,225,255)' />";
+											$svg.="<rect x='".(($i*50)+50)."' y='60' width='50' height='340' fill='rgb(230,230,230)' />";
 									}else{
-											$svg.="<rect x='".(($i*50)+50)."' y='60' width='50' height='340' fill='rgb(255,225,225)' />";
+											$svg.="<rect x='".(($i*50)+50)."' y='60' width='50' height='340' fill='rgb(245,245,245)' />";
 									}
 							}
 							
@@ -442,13 +443,13 @@ session_start();
 							}
 						
 							$svg.="<polyline points='".$iv."' stroke='none' fill='lightblue' stroke-width='3' opacity='0.4' />";							
-							$svg.="<polyline points='".$stv."' stroke='none' fill='darkblue' stroke-width='3' opacity='0.1' />";																																	 
+							$svg.="<polyline points='".$stv."' stroke='none' fill='rgb(32,128,32)' stroke-width='3' opacity='0.1' />";																																	 
 							$svg.="<polyline points='".$pnt."' stroke='green' fill='none' stroke-width='3' />";
 						
 							$svg.=$circ;	
 						
 							for($i=0;$i<$cnt;$i++){
-									$svg.="<text textLength='20' x='".(($i*50)+75)."' y='410' fill='rgb(0,0,0)' transform='rotate(45 ".(($i*50)+75)." 410)' fontfamily='Arial' font-size='10' text-anchor='left' dominant-baseline='central' >".substr($svgarr[$i][0],0,12)."</text>";
+									$svg.="<text textLength='20' x='".(($i*50)+75)."' y='410' fill='rgb(0,0,0)' transform='rotate(45 ".(($i*50)+75)." 410)' fontfamily='Arial' font-size='10' text-anchor='left' dominant-baseline='central' >".$svgarr[$i][0]."</text>";
 							}
 						
 							$svg.="<polyline points='47,50,53,50,50,42' stroke='none' fill='black' stroke-width='3' />";
