@@ -263,6 +263,21 @@ session_start();
 				
 					$csv="";
 					$svgarr=Array();
+					$userarr=Array();
+				
+					// Retrieve list of all user hashes for any response -- no resubmissions count
+					$query=$log_db->prepare('SELECT distinct(userhash) FROM response where hash=:hash');
+					$query->bindParam(':hash', $hash);
+					if (!$query->execute()) {
+							$error = $log_db->errorInfo();
+							print_r($error);
+					}else{
+							
+							$rows = $query->fetchAll();	
+							foreach($rows as $row){
+									array_push($userarr,$row['userhash']);
+							}
+					}
 				
 					// Retrieve full database and swizzle into associative array for each day
 					$query=$log_db->prepare('SELECT * FROM item where hash=:hash order by questno');
@@ -271,13 +286,14 @@ session_start();
 							$error = $log_db->errorInfo();
 							print_r($error);
 					}else{
+							
 							$labels=explode(",","A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,X,Y,Z,AA,AB,AC,AD,AE,AF,AG,AH,AI,AJ");
 							$i=1;
 							$show=false;
 							$rows = $query->fetchAll();	
 							foreach($rows as $row){
 																
-									// Any text-based response
+									// Any text-based response independent of the number of respondents i.e. same user may resubmit
 									$cquery=$log_db->prepare('SELECT * FROM response where hash=:hash and itemid=:itemid;');
 									$cquery->bindParam(':hash', $hash);
 									$cquery->bindParam(':itemid', $row['id']);
@@ -297,7 +313,7 @@ session_start();
 													$csv.=",description";
 
 													$j=0;
-													foreach($crows as $crow){
+													foreach($userarr as $user){
 															$j++;
 															$csv.=",resp".$j;
 													}
@@ -319,26 +335,35 @@ session_start();
 										
 											$statitems=Array();
 											
+											// Iterate over all responses of this question to collect max and min
 											foreach($crows as $crow){
 													if($max<floatval($crow['val'])) $max=floatval($crow['val']);
 													if($min>floatval($crow['val'])) $min=floatval($crow['val']);
 													$avg+=(floatval($crow['val'])/count($crows));
-													$csv.=",".$crow['val'];
 													array_push($statitems,floatval($crow['val']));
 											}
-											
+										
+											// Iterate over all users to perform per user computation - only last response in list is kept
+											foreach($userarr as $user){
+													$theval="";
+													foreach($crows as $crow){
+															if($crow['userhash']==$user) $theval=$crow['val'];
+													}
+													$csv.=",".$crow['val'];
+											}
+														
 											$stdev=0;
 											if(count($crows)>1){
 													$stdev=stats_standard_deviation($statitems);
 											}
 
 											$firstcol=3;
-											$lastcol=2+count($crows);
+											$lastcol=2+count($userarr);
 
 											$i++;
 
 											// If it is a number add the max min average columns
-											if(($row['type']==2)&&(count($crows)>0)){
+											if(($row['type']==2)&&(count($userarr)>0)){
 													
 													$theitem=Array();
 													array_push($theitem,$row['description']);
