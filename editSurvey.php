@@ -278,9 +278,9 @@ session_start();
 							foreach($rows as $row){
 																
 									// Any text-based response
-									$cquery=$log_db->prepare('SELECT * FROM response where hash=:hash and questno=:questno;');
+									$cquery=$log_db->prepare('SELECT * FROM response where hash=:hash and itemid=:itemid;');
 									$cquery->bindParam(':hash', $hash);
-									$cquery->bindParam(':questno', $row['questno']);
+									$cquery->bindParam(':itemid', $row['id']);
 									if (!$cquery->execute()) {
 											$error = $log_db->errorInfo();
 											print_r($error);
