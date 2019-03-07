@@ -104,7 +104,7 @@ session_start();
 			if(isset($_POST[$name]))	return $_POST[$name];
 			else return "UNK";
 	}
-
+		
 	//------------------------------------------------------------------------------------------------
 
 	$kumho=425;
@@ -135,7 +135,7 @@ session_start();
 	$log_db->exec($sql);
 	$sql = 'CREATE TABLE IF NOT EXISTS item(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER,labelA text, labelB text, labelC text, description TEXT, type INTEGER);';		
 	$log_db->exec($sql);	
-	$sql = 'CREATE TABLE IF NOT EXISTS response(id INTEGER PRIMARY KEY,hash VARCHAR(32),questno INTEGER, itemid INTEGER, val TEXT, useragent TEXT, userhash varchar(32));';		
+	$sql = 'CREATE TABLE IF NOT EXISTS response(id INTEGER PRIMARY KEY,resphash VARCHAR(32),hash VARCHAR(32),questno INTEGER, itemid INTEGER, val TEXT, useragent TEXT, userhash varchar(32));';		
 	$log_db->exec($sql);	
 		
 	if($cmd=="LOGOFF"){
