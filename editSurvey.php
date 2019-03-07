@@ -107,6 +107,8 @@ session_start();
 
 	//------------------------------------------------------------------------------------------------
 
+	$kumho=425;
+		
 	$description=getOP('description');
 	$labelA=getOP('labelA');
 	$labelB=getOP('labelB');		
@@ -117,8 +119,11 @@ session_start();
 	$swapid=getOP('SwapId');
 	$swapno=getOP('SwapNo');		
 	$swapoutid=getOP('SwapOutId');
-	$swapoutno=getOP('SwapOutNo');		
-			
+	$swapoutno=getOP('SwapOutNo');
+	$scatter=getOP('scatter');
+	
+	// print_r($_POST);
+		
 	$cmd=getOP('CMD');
 	$hash=getOP('hash');
 	$admincode=getOP('admincode');
@@ -332,6 +337,7 @@ session_start();
 											$max=0;
 											$min=10000;
 											$avg=0;
+											$sca="";
 										
 											$statitems=Array();
 											
@@ -340,6 +346,7 @@ session_start();
 													if($max<floatval($crow['val'])) $max=floatval($crow['val']);
 													if($min>floatval($crow['val'])) $min=floatval($crow['val']);
 													$avg+=(floatval($crow['val'])/count($crows));
+													$sca.="<circle cx='".(($i*50)+25)."' cy='".($kumho-(floatval($crow['val'])*50))."' r='3' fill='blue' opacity='0.1' />";
 													array_push($statitems,floatval($crow['val']));
 											}
 										
@@ -372,6 +379,8 @@ session_start();
 													array_push($theitem,$min);
 													array_push($theitem,$max);
 													array_push($theitem,$stdev);
+													array_push($theitem,$sca);												  
+												
 													array_push($svgarr,$theitem);												
 													
 													$colS=$labels[$firstcol];
@@ -424,8 +433,6 @@ session_start();
 							$iv="";
 							$stv="";
 						
-							$kumho=425;
-						
 							$circ="";
 						
 							for($i=0;$i<$cnt;$i++){
@@ -437,6 +444,10 @@ session_start();
 										if($i==0) $iv.=(($i*50)+50).",".($kumho-($minval*50));
 										if($i==0) $stv.=(($i*50)+50).",".($kumho-(($val*50)-($stdev*50)));										
 
+										$stdev=floatval($svgarr[$i][5]);
+
+										if($scatter=='on') $circ.=$svgarr[$i][6];
+										
 										$circ.="<circle cx='".(($i*50)+75)."' cy='".($kumho-($val*50))."' r='4' fill='green'/>";
 										$circ.="<text x='".(($i*50)+75)."' y='".($kumho-($val*50)-10)."' fill='black' text-anchor='middle' >".round($val,1)."</text>";
 								
@@ -516,6 +527,7 @@ session_start();
 					echo "<input type='hidden' name='hash' value='".$hash."'>";
 					echo "<input type='hidden' name='CMD' value='EXPOSVG'>";
 					echo "<input type='submit' value='Export svg' >\n";
+					echo "Scatter: <input type='checkbox' name='scatter' >";
 					echo "</form>";
 				
 					// Logoff
