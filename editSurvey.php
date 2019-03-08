@@ -137,7 +137,24 @@ session_start();
 	$log_db->exec($sql);	
 	$sql = 'CREATE TABLE IF NOT EXISTS response(id INTEGER PRIMARY KEY,resphash VARCHAR(32),hash VARCHAR(32),questno INTEGER, itemid INTEGER, val TEXT, useragent TEXT, userhash varchar(32));';		
 	$log_db->exec($sql);	
-		
+
+	// Check if resphash column exists, add it if not exists
+	$query=$log_db->prepare('PRAGMA table_info("response");');
+	if (!$query->execute()) {
+			$error = $log_db->errorInfo();
+			print_r($error);
+	}else{
+      $hasResphash=false;
+			$rows = $query->fetchAll(PDO::FETCH_ASSOC);	
+			foreach($rows as $row){
+					if($row["name"]==="resphash")$hasResphash=true;
+      }
+      if(!$hasResphash){
+          $sql = 'ALTER TABLE response ADD COLUMN resphash VARCHAR(32);';		
+          $log_db->exec($sql);	      
+      }
+	}
+
 	if($cmd=="LOGOFF"){
 				session_unset();
 				session_destroy();
@@ -356,7 +373,8 @@ session_start();
 													foreach($crows as $crow){
 															if($crow['userhash']==$user) $theval=$crow['val'];
 													}
-													$csv.=",".$crow['val'];
+													//$csv.=",".$crow['val'];
+													$csv.=",".$theval;
 											}
 														
 											$stdev=0;
