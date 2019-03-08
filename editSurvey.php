@@ -122,7 +122,7 @@ session_start();
 	$swapoutno=getOP('SwapOutNo');
 	$scatter=getOP('scatter');
 	
-	// print_r($_POST);
+	//print_r($_POST);
 		
 	$cmd=getOP('CMD');
 	$hash=getOP('hash');
@@ -356,7 +356,7 @@ session_start();
 													foreach($crows as $crow){
 															if($crow['userhash']==$user) $theval=$crow['val'];
 													}
-													$csv.=",".$crow['val'];
+													$csv.=",".$theval;
 											}
 														
 											$stdev=0;
@@ -712,6 +712,11 @@ session_start();
 			
 			
 	}else{
+		
+			session_unset();
+			session_destroy();
+			$_SESSION=Array();
+		
 			// Make survvey administration form 
 			echo "<div id='admincode'>\n";
 			echo "<form method='POST' name='editSurvey' action='editSurvey.php' >\n";

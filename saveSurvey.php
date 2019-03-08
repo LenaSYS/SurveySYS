@@ -86,7 +86,7 @@ session_start();
 			if($key!='hash'&&$key!='userhash'){
 					$lst=explode("_",$key);
 					
-          $query = $log_db->prepare('INSERT INTO response(hash,surveyhash,questno,itemid,val,useragent,userhash) VALUES (:hash,:resphash,:questno,:itemid,:val,:useragent,:userhash);');					
+          $query = $log_db->prepare('INSERT INTO response(hash,resphash,questno,itemid,val,useragent,userhash) VALUES (:hash,:resphash,:questno,:itemid,:val,:useragent,:userhash);');					
 					$query->bindParam(':hash', $hash);
 					$query->bindParam(':questno', $lst[2]);				
 					$query->bindParam(':itemid', $lst[1]);
