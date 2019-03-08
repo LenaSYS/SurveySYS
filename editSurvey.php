@@ -363,7 +363,7 @@ session_start();
 													if($max<floatval($crow['val'])) $max=floatval($crow['val']);
 													if($min>floatval($crow['val'])) $min=floatval($crow['val']);
 													$avg+=(floatval($crow['val'])/count($crows));
-													$sca.="<circle cx='".(($i*50)+25)."' cy='".($kumho-(floatval($crow['val'])*50))."' r='3' fill='blue' opacity='0.1' />";
+													$sca.="<circle cx='".((($i-1)*50)+25)."' cy='".($kumho-(floatval($crow['val'])*50))."' r='3' fill='blue' opacity='0.1' />";
 													array_push($statitems,floatval($crow['val']));
 											}
 										
