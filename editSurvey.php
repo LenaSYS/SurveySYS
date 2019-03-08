@@ -137,7 +137,24 @@ session_start();
 	$log_db->exec($sql);	
 	$sql = 'CREATE TABLE IF NOT EXISTS response(id INTEGER PRIMARY KEY,resphash VARCHAR(32),hash VARCHAR(32),questno INTEGER, itemid INTEGER, val TEXT, useragent TEXT, userhash varchar(32));';		
 	$log_db->exec($sql);	
-		
+
+	// Check if resphash column exists, add it if not exists
+	$query=$log_db->prepare('PRAGMA table_info("response");');
+	if (!$query->execute()) {
+			$error = $log_db->errorInfo();
+			print_r($error);
+	}else{
+      $hasResphash=false;
+			$rows = $query->fetchAll(PDO::FETCH_ASSOC);	
+			foreach($rows as $row){
+					if($row["name"]==="resphash")$hasResphash=true;
+      }
+      if(!$hasResphash){
+          $sql = 'ALTER TABLE response ADD COLUMN resphash VARCHAR(32);';		
+          $log_db->exec($sql);	      
+      }
+	}
+
 	if($cmd=="LOGOFF"){
 				session_unset();
 				session_destroy();
@@ -346,7 +363,7 @@ session_start();
 													if($max<floatval($crow['val'])) $max=floatval($crow['val']);
 													if($min>floatval($crow['val'])) $min=floatval($crow['val']);
 													$avg+=(floatval($crow['val'])/count($crows));
-													$sca.="<circle cx='".(($i*50)+25)."' cy='".($kumho-(floatval($crow['val'])*50))."' r='3' fill='blue' opacity='0.1' />";
+													$sca.="<circle cx='".((($i-1)*50)+25)."' cy='".($kumho-(floatval($crow['val'])*50))."' r='3' fill='blue' opacity='0.1' />";
 													array_push($statitems,floatval($crow['val']));
 											}
 										
