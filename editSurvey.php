@@ -488,7 +488,7 @@ session_start();
 						
 							for($i=0;$i<$cnt;$i++){
 								$textrows = explode("\n", wordwrap($svgarr[$i][0], 60));
-								for($j=0;$j<count($arr);$j++) {
+								for($j=0;$j<count($textrows);$j++) {
 									$svg.="<text x='".(($i*50)+75)."' y='".(($j*10)+410)."'  fill='rgb(0,0,0)' transform='rotate(45 ".(($i*50)+75)." 410)' inline-size='200px' fontfamily='Arial' font-size='10' text-anchor='left' dominant-baseline='central' >".$textrows[$j]."</text>";
 								}
 							}
