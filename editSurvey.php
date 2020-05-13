@@ -487,7 +487,10 @@ session_start();
 							$svg.=$circ;	
 						
 							for($i=0;$i<$cnt;$i++){
-									$svg.="<text textLength='20' x='".(($i*50)+75)."' y='410' fill='rgb(0,0,0)' transform='rotate(45 ".(($i*50)+75)." 410)' fontfamily='Arial' font-size='10' text-anchor='left' dominant-baseline='central' >".$svgarr[$i][0]."</text>";
+								$textrows = explode("\n", wordwrap($svgarr[$i][0], 60));
+								for($j=0;$j<count($arr);$j++) {
+									$svg.="<text x='".(($i*50)+75)."' y='".(($j*10)+410)."'  fill='rgb(0,0,0)' transform='rotate(45 ".(($i*50)+75)." 410)' inline-size='200px' fontfamily='Arial' font-size='10' text-anchor='left' dominant-baseline='central' >".$textrows[$j]."</text>";
+								}
 							}
 						
 							$svg.="<polyline points='47,50,53,50,50,42' stroke='none' fill='black' stroke-width='3' />";
