@@ -402,7 +402,7 @@ session_start();
           $csv=str_replace("'","",$csv);
 					if($cmd=="EXPO"){
               echo "<script>";
-							echo "var csvContent='".$csv."';";
+							echo "var csvContent=`".$csv."`;";
 							echo "var encodedUri = 'data:text/csv;charset=utf-8,'+encodeURI(csvContent);";
 							echo "var link = document.createElement('a');";
 							echo "link.setAttribute('href', encodedUri);";
@@ -499,7 +499,7 @@ session_start();
 							$svg.="</svg>";
 
 							echo "<script>";
-							echo "var svgContent=\"".$svg."\";";
+							echo "var svgContent=`".$svg."`;";
 							echo "var encodedUri = 'data:text/svg;charset=utf-8,'+encodeURI(svgContent);";
 							echo "var link = document.createElement('a');";
 							echo "link.setAttribute('href', encodedUri);";
