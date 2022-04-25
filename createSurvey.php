@@ -112,18 +112,18 @@ session_start();
 	}
 
 			// Make survvey administration form 
-			echo "<div id='admincode'>\n";
-			echo "Enter survey hash and administration code to edit an existing survey.<br>";
-			echo "<em>Please keep a copy of hash and administration code for future use, without these, it is not possible to edit the survey.</em>";
-			echo "<form method='POST' name='editSurvey' action='editSurvey.php' >\n";
-			echo "<input type='hidden' name='CMD' value='EDIT' >\n";
-			echo "<table>\n";
-			echo "<tr><td>Hash:</td><td><input type='text' placeholder='Enter Hash' name='hash' ></td></tr>\n";
-			echo "<tr><td>Code:</td><td><input type='text' placeholder='Admin Code' name='admincode' ></td></tr>\n";		
-			echo "</table>\n";
-			echo "<input type='submit' value='Edit Survey' >\n";
-			echo "</form>\n";
-			echo "</div>\n";
+			// echo "<div id='admincode'>\n";
+			// echo "Enter survey hash and administration code to edit an existing survey.<br>";
+			// echo "<em>Please keep a copy of hash and administration code for future use, without these, it is not possible to edit the survey.</em>";
+			// echo "<form method='POST' name='editSurvey' action='editSurvey.php' >\n";
+			// echo "<input type='hidden' name='CMD' value='EDIT' >\n";
+			// echo "<table>\n";
+			// echo "<tr><td>Hash:</td><td><input type='text' placeholder='Enter Hash' name='hash' ></td></tr>\n";
+			// echo "<tr><td>Code:</td><td><input type='text' placeholder='Admin Code' name='admincode' ></td></tr>\n";		
+			// echo "</table>\n";
+			// echo "<input type='submit' value='Edit Survey' >\n";
+			// echo "</form>\n";
+			// echo "</div>\n";
 		
 ?>
 		
