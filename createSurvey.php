@@ -10,12 +10,12 @@ session_start();
 			font-size:16px;
 	}
 		
-	#admincode {		
+	/* #admincode {		
 			border: 2px solid red;
 			border-radius: 6px;
 			margin: 8px;
 			padding: 8px;			
-	}
+	} */
 	</style>
 	<script>
 	</script>
@@ -75,7 +75,6 @@ session_start();
 		
 			// Insert new survey data
 			if($cmd=="NEW"){
-					echo "Making new survey";
 					$query = $log_db->prepare('INSERT INTO survey(hash,name,description,admincode) VALUES (:hash,:name,:description,:admincode)');
 					
 					$query->bindParam(':hash', $hash);
@@ -87,28 +86,39 @@ session_start();
 							$error = $query->errorInfo();
 							$debug = "Error updating database: " . $error[2];
 					}
-
-					echo "<div id='admincode'>\n";
-					echo "<table>\n";
+					echo "<div style='width: 600px; margin:auto'>";		
+					echo "<h2>New Servey created</h2>";
+					echo "<div id='admincode'>";
+					echo "<p>Notera informationen nedan på ett säkert ställe. Du behöver <strong>survey hash</strong> och <strong>admin code</strong> för att kunna administrera din survey.</p>";
+					echo "<table>";
 					echo "<tr><td>New Survey Created: ".$crename."</td></tr>";
 					echo "<tr><td>Survey Hash: ".$hash."</td></tr>";
 					echo "<tr><td>Admin Code: ".$admincode."</td></tr>";
-					echo "</table>\n";
-					echo "</div>\n";
+					echo "</table>";
+					echo "</div>";
+					echo "<a href='editSurvey.php'>Edit survey</a>";
+					echo "</div>";
 			}
 	}else{
 			// Make survvey administration form 
+			echo "<div style='width: 600px; margin:auto'>";
+			echo "<h2>Create new survey</h2>";
 			echo "<form method='POST' name='editSurvey' action='createSurvey.php' >\n";
 			echo "<input type='hidden' name='CMD' value='NEW' >\n";
-			echo "<table>\n";
-			echo "<tr><td>Name:</td><td><input type='text' name='crename' placeholder='New Survey Name' ></td></tr>\n";
-			echo "<tr><td>Description</td><td>";
-			echo "<textarea rows='8' cols='40' name='desc' >";
-			echo "</textarea>";
-			echo "</tr></td>";
-			echo "</table>\n";
+			echo "<div style='margin-bottom:2em;'>";
+			echo "<label style='display:block;' for='crename'>Name</label>";
+			echo "<input style='width:100%;' id='crename' type='text' name='crename' placeholder='New Survey Name' >";
+			echo "</div>";
+			echo "<div style='margin-bottom:2em;'>";
+			echo "<label style='display:block' for='desc'>Description</label>";
+			echo "<textarea style='width:100%;' id='desc' rows='8' cols='40' name='desc' ></textarea>";
+			echo "</div>";
+			echo "<div style='margin-bottom:2em; display:flex; flex-wrap:nowrap; justify-content:space-between'>";
+			echo "<a href='editSurvey.php'>Edit existing survey</a>";
 			echo "<input type='submit' value='Create Survey' >\n";
+			echo "</div>";
 			echo "</form>\n";
+			echo "</div>";
 	}
 
 			// Make survvey administration form 
