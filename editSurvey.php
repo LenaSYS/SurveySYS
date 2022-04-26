@@ -484,7 +484,8 @@ if (!isset($_SESSION)) {
 	// ----------========== Fetch data from db ==========----------
 	//
 	$datarow = array();
-	// Retrieve full database and swizzle into associative array for each day
+	$survey_items=array();
+	// Fetch survey
 	$query = $log_db->prepare('SELECT * FROM survey where hash=:hash and admincode=:admincode;');
 	$query->bindParam(':hash', $hash);
 	$query->bindParam(':admincode', $admincode);
@@ -498,6 +499,16 @@ if (!isset($_SESSION)) {
 		}
 	}
 
+	// Fetch survey items
+	$query = $log_db->prepare('SELECT * FROM item where hash=:hash order by questno;');
+	$query->bindParam(':hash', $hash);
+	if (!$query->execute()) {
+		$error = $log_db->errorInfo();
+		print_r($error);
+	} else {
+		$survey_items = $query->fetchAll();
+	}
+
 	//
 	// ----------========== Render edit page ==========----------
 	// 
@@ -508,68 +519,77 @@ if (!isset($_SESSION)) {
 		$_SESSION['surveydescription'] = $datarow["description"];
 
 		echo "<div style='width: 800px; margin:auto'>";
-		echo "<h2>Edit survey</h2>";
-		echo "<div><span>Survey:</span> " . $hash . "</span></div>";
-		echo "<div id='admincode'>\n";
+		echo "<h2>Edit survey ".$_SESSION['surveyname']."</h2>";
+		echo "<div><span>Survey hash:</span> <code>" . $hash . "</code></span></div>";
+		// Logoff
+		echo "<form method='post' action='editSurvey.php' >";
+		echo "<input type='hidden' name='CMD' value='LOGOFF'>";
+		echo "<input type='submit' value='Logoff' >\n";
+		echo "</form>";
+
+
+		echo "<h3>Export functions</h3>";
+		// Export!
+		echo "<form method='post' action='editSurvey.php' >";
+		echo "<input type='hidden' name='hash' value='" . $hash . "'>";
+		echo "<input type='hidden' name='CMD' value='EXPO'>";
+		echo "<input type='submit' value='Export survey results as csv' >\n";
+		echo "</form>";
+		// Export!
+		echo "<form method='post' action='editSurvey.php' >";
+		echo "<input type='hidden' name='hash' value='" . $hash . "'>";
+		echo "<input type='hidden' name='CMD' value='EXPOSVG'>";
+		echo "<input type='submit' value='Export survey results as svg' >\n";
+		echo "Scatter: <input type='checkbox' name='scatter' >";
+		echo "</form>";
+		
+		echo "<h3>Edit survey description</h3>";
+		echo "<div style='width:600px;margin:auto;'>";
+		echo "<form method='post' action='editSurvey.php' >";
+		echo "<input type='hidden' name='hash' value='" . $hash . "'>";
+		echo "<input type='hidden' name='id' value='" . $id . "'>";
+		echo "<input type='hidden' name='CMD' value='UPDDESC'>";
+		echo "<div style='margin-bottom:1em;'>";
+		echo "<label for='description' style='width:100%;font-weight:bold;font-size:small;'>Survey description</label>";
+		echo "<textarea style='width:100%;' id='description' rows='8' cols='40' name='description' >". $datarow['description'] ."</textarea>";
+		echo "</div>";
+		echo "<div style='display:flex;justify-content:flex-end;margin-bottom:1em;'>";
+		echo "<input type='submit' value='Update survey description'>\n";
+		echo "</div>";
+		echo "</form>";
+		echo "</div>";
+
+		echo "<h3>Add survey item</h3>";
+		echo "<div id='admincode' style='width:600px;margin:auto;'>\n";
 		echo "<form method='POST' name='editSurvey' action='editSurvey.php' >\n";
 		echo "<input type='hidden' name='CMD' value='NEW' >\n";
-		echo "<table>\n";
-		echo "<tr><td>Type:</td><td><select name='type'><option value='1'>Link</option><option value='2'>Number</option><option value='3'>Text</option></select></td></tr>\n";
-		echo "<tr><td>Question:</td><td><input type='text' name='description'></td></tr>\n";
-		echo "<tr><td>Left Label:</td><td><input type='text' name='labelA'></td></tr>\n";
-		echo "<tr><td>Right Label:</td><td><input type='text' name='labelB'></td></tr>\n";
-		echo "<tr><td>Center Label:</td><td><input type='text' name='labelC'></td></tr>\n";
-		echo "</table>\n";
-		echo "<input type='submit' value='New Item' >\n";
-		echo "</form>\n";
-		echo "</div>\n";
+		echo "<div style='margin-bottom:1em;'>";
+		echo "<label style='display:block;font-weight:bold;font-size:small;' for='type'>Question type</label>";
+		echo "<select id='type' name='type'><option value='1'>URL</option><option value='2'>Ranking question</option><option value='3'>Free-text question</option></select>";
+		echo "</div>";
+		echo "<div style='margin-bottom:1em;'>";
+		echo "<label style='display:block;font-weight:bold;font-size:small;' for='description'>Question/URL</label>";
+		echo "<input style='width:100%;' id='description' type='text' name='description'>";
+		echo "</div>";
+		echo "<div style='display:flex;flex-wrap:nowrap;justify-content:space-between;gap:12px;margin-bottom:1em;'>";
+		echo "<div><label style='font-weight:bold;font-size:small;'>Left Label</label><input style='width:100%;' type='text' name='labelA'></div>";
+		echo "<div><label style='width:100%;font-weight:bold;font-size:small;'>Center Label</label><input style='width:100%;' type='text' name='labelC'></div>";
+		echo "<div><label style='width:100%;font-weight:bold;font-size:small;'>Right Label</label><input style='width:100%;' type='text' name='labelB'></div>";
+		echo "</div>";
+		echo "<div style='display:flex;flex-wrap:nowrap;justify-content:flex-end;margin-bottom:1em;'>";
+		echo "<input type='submit' value='Add survey item' >";
+		echo "</div>";
+		echo "</form>";
+		echo "</div>";
 
-
-
-		// Retrieve full database and swizzle into associative array for each day
-		$query = $log_db->prepare('SELECT * FROM item where hash=:hash order by questno;');
-		$query->bindParam(':hash', $hash);
-		if (!$query->execute()) {
-			$error = $log_db->errorInfo();
-			print_r($error);
-		} else {
-
-			// Export!
-			echo "<form method='post' action='editSurvey.php' >";
-			echo "<input type='hidden' name='hash' value='" . $hash . "'>";
-			echo "<input type='hidden' name='CMD' value='EXPO'>";
-			echo "<input type='submit' value='Export csv' >\n";
-			echo "</form>";
-
-			// Export!
-			echo "<form method='post' action='editSurvey.php' >";
-			echo "<input type='hidden' name='hash' value='" . $hash . "'>";
-			echo "<input type='hidden' name='CMD' value='EXPOSVG'>";
-			echo "<input type='submit' value='Export svg' >\n";
-			echo "Scatter: <input type='checkbox' name='scatter' >";
-			echo "</form>";
-
-			// Logoff
-			echo "<form method='post' action='editSurvey.php' >";
-			echo "<input type='hidden' name='CMD' value='LOGOFF'>";
-			echo "<input type='submit' value='Logoff' >\n";
-			echo "</form>";
-
-			echo "<form method='post' action='editSurvey.php' >";
-			echo "<input type='hidden' name='hash' value='" . $hash . "'>";
-			echo "<input type='hidden' name='id' value='" . $id . "'>";
-			echo "<input type='hidden' name='CMD' value='UPDDESC'>";
-			echo "<input type='text' name='description' value='" . $datarow['description'] . "'>";
-			echo "<input type='submit' value='Update Description' >\n";
-			echo "</form>";
+		echo "<h3>Survey items</h3>";
+		if(sizeof($survey_items)>0){
 			echo "<table>";
-
 			echo "<tr><th>Prio</th><th>Type</th><th>Labels (Left Right Center)</th><th>Description/Question</th></tr>";
 
 			$lastrow = 'UNK';
 			$lastno = 'UNK';
-			$rows = $query->fetchAll();
-			foreach ($rows as $row) {
+			foreach ($survey_items as $row) {
 				echo "<tr>";
 
 				// Number
@@ -578,11 +598,11 @@ if (!isset($_SESSION)) {
 				// Type
 				echo "<td style='border:1px solid red;border-radius:4px;'><form method='post' action='editSurvey.php' ><input type='hidden' name='id' value='" . $row['id'] . "'><select name='type'>";
 				if ($row['type'] == 1) {
-					echo "<option value='1' selected='selected'>Link</option><option value='2'>Number</option><option value='3'>Text</option></select>";
+					echo "<option value='1' selected='selected'>URL</option><option value='2'>Ranking question</option><option value='3'>Free-text question</option></select>";
 				} else if ($row['type'] == 2) {
-					echo "<option value='1'>Link</option><option value='2' selected='selected'>Number</option><option value='3'>Text</option></select>";
+					echo "<option value='1'>URL</option><option value='2' selected='selected'>Ranking question</option><option value='3'>Free-text question</option></select>";
 				} else if ($row['type'] == 3) {
-					echo "<option value='1'>Link</option><option value='2'>Number</option><option value='3' selected='selected'>Text</option></select>";
+					echo "<option value='1'>URL</option><option value='2'>Ranking question</option><option value='3' selected='selected'>Free-text question</option></select>";
 				} else {
 					echo "Unknown type: " . $row['type'];
 				}
@@ -644,7 +664,7 @@ if (!isset($_SESSION)) {
 			}
 			echo "</table>";
 
-			echo "<h3>Preview</h3>";
+			echo "<h3>Survey preview</h3>";
 
 			// Preview
 			echo "<table class='survey'>";
@@ -657,16 +677,18 @@ if (!isset($_SESSION)) {
 			echo "</tr>";
 			echo "<tr>";
 			echo "<th>";
+			echo "<div style='padding:2em 1em;'>";
 			echo $_SESSION['surveydescription'];
+			echo "</div>";
 			echo "</th>";
 			echo "</tr>";
 			echo "</thead>";
 			echo "<tbody>";
-			foreach ($rows as $row) {
+			foreach ($survey_items as $row) {
 				if ($row['type'] == 2) {
 					echo "<tr>";
 					echo "<td>";
-					echo "<table>";
+					echo "<table style='width:100%;'>";
 
 					// Question / Description
 					echo "<tr><td colspan='3'>" . $row['description'] . "</td></tr>";
@@ -680,9 +702,9 @@ if (!isset($_SESSION)) {
 
 					// Labels
 					echo "<tr>";
-					echo "<td style='text-align:left;' colspan='2'>" . $row['labelA'] . "</td>";
-					echo "<td style='text-align:center;' colspan='3'>" . $row['labelC'] . "</td>";
-					echo "<td style='text-align:right;' colspan='2'>" . $row['labelB'] . "</td>";
+					echo "<td style='text-align:left;'>" . $row['labelA'] . "</td>";
+					echo "<td style='text-align:center;'>" . $row['labelC'] . "</td>";
+					echo "<td style='text-align:right;'>" . $row['labelB'] . "</td>";
 					echo "</tr>";
 
 					echo "</table>";
@@ -690,10 +712,10 @@ if (!isset($_SESSION)) {
 					echo "</tr>";
 				} else if ($row['type'] == 3) {
 					echo "<tr>";
-					echo "<td><table>";
+					echo "<td><table style='width:100%'>";
 
 					// Question / Description
-					echo "<tr><td colspan='2'>" . $row['description'] . "</td></tr>";
+					echo "<tr><td>" . $row['description'] . "</td></tr>";
 
 					// Text Input with Labels
 					echo "<td>" . $row['labelA'] . ":</td><td><input type='text' name='qq_" . $row['id'] . "_" . $row['questno'] . "' value='" . $row['labelC'] . "'></td>";
@@ -702,10 +724,10 @@ if (!isset($_SESSION)) {
 					echo "</tr>";
 				} else if ($row['type'] == 1) {
 					echo "<tr>";
-					echo "<td><table>";
+					echo "<td><table style='width:100%'>";
 
 					// URL
-					echo "<tr><td colspan='2'>" . $row['labelA'] . " <a href='" . $row['description'] . "' target='_blank'>" . $row['description'] . "</a> " . $row['labelB'] . "</td></tr>";
+					echo "<tr><td>" . $row['labelA'] . " <a href='" . $row['description'] . "' target='_blank'>" . $row['description'] . "</a> " . $row['labelB'] . "</td></tr>";
 
 					echo "</table></td>";
 					echo "</tr>";
