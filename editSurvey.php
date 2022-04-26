@@ -160,6 +160,9 @@ if (!isset($_SESSION)) {
 	// EXPO    --> Export survey results as csv file
 	// EXPOSVG --> Export survey results as svg image
 
+	$svgarr = array();
+	$userarr = array();
+
 	if ($cmd == "LOGOFF") {
 		if (isset($_SESSION)) {
 			session_unset();
@@ -241,8 +244,6 @@ if (!isset($_SESSION)) {
 	} else if ($cmd == "EXPO" || $cmd == "EXPOSVG") {
 
 		$csv = "";
-		$svgarr = array();
-		$userarr = array();
 
 		// Retrieve list of all user hashes for any response -- no resubmissions count
 		$query = $log_db->prepare('SELECT distinct(userhash) FROM response where hash=:hash');
@@ -485,6 +486,9 @@ if (!isset($_SESSION)) {
 	//
 	$datarow = array();
 	$survey_items=array();
+	$svgarr = array();
+	$userarr = array();
+
 	// Fetch survey
 	$query = $log_db->prepare('SELECT * FROM survey where hash=:hash and admincode=:admincode;');
 	$query->bindParam(':hash', $hash);
@@ -509,6 +513,20 @@ if (!isset($_SESSION)) {
 		$survey_items = $query->fetchAll();
 	}
 
+	$query = $log_db->prepare('SELECT distinct(userhash) FROM response where hash=:hash');
+	$query->bindParam(':hash', $hash);
+	if (!$query->execute()) {
+		$error = $log_db->errorInfo();
+		print_r($error);
+	} else {
+
+		$rows = $query->fetchAll();
+		foreach ($rows as $row) {
+			array_push($userarr, $row['userhash']);
+		}
+	}
+
+
 	//
 	// ----------========== Render edit page ==========----------
 	// 
@@ -521,6 +539,7 @@ if (!isset($_SESSION)) {
 		echo "<div style='width: 800px; margin:auto'>";
 		echo "<h2>Edit survey ".$_SESSION['surveyname']."</h2>";
 		echo "<div><span>Survey hash:</span> <code>" . $hash . "</code></span></div>";
+		echo "<div><span>Number of respondents:</span> <code>" . sizeof($userarr) . "</code></span></div>";
 		// Logoff
 		echo "<form method='post' action='editSurvey.php' >";
 		echo "<input type='hidden' name='CMD' value='LOGOFF'>";
@@ -564,7 +583,7 @@ if (!isset($_SESSION)) {
 		echo "<form method='POST' name='editSurvey' action='editSurvey.php' >\n";
 		echo "<input type='hidden' name='CMD' value='NEW' >\n";
 		echo "<div style='margin-bottom:1em;'>";
-		echo "<label style='display:block;font-weight:bold;font-size:small;' for='type'>Question type</label>";
+		echo "<label style='display:block;font-weight:bold;font-size:small;' for='type'>Survey item type</label>";
 		echo "<select id='type' name='type'><option value='1'>URL</option><option value='2'>Ranking question</option><option value='3'>Free-text question</option></select>";
 		echo "</div>";
 		echo "<div style='margin-bottom:1em;'>";
