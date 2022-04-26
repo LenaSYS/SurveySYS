@@ -665,86 +665,12 @@ if (!isset($_SESSION)) {
 			echo "</table>";
 
 			echo "<h3>Survey preview</h3>";
-
-			// Preview
-			echo "<table class='survey'>";
-			//echo "<caption>".$_SESSION['surveyname']."</caption>";
-			echo "<thead>";
-			echo "<tr>";
-			echo "<th>";
-			echo $_SESSION['surveyname'];
-			echo "</th>";
-			echo "</tr>";
-			echo "<tr>";
-			echo "<th>";
-			echo "<div style='padding:2em 1em;'>";
-			echo $_SESSION['surveydescription'];
-			echo "</div>";
-			echo "</th>";
-			echo "</tr>";
-			echo "</thead>";
-			echo "<tbody>";
-			foreach ($survey_items as $row) {
-				if ($row['type'] == 2) {
-					echo "<tr>";
-					echo "<td>";
-					echo "<table style='width:100%;'>";
-
-					// Question / Description
-					echo "<tr><td colspan='3'>" . $row['description'] . "</td></tr>";
-
-					// Radio Buttons
-					echo "<tr><td colspan='3'><div style='display:flex;flex-wrap: nowrap;justify-content:space-between;'>";
-					for ($i = 1; $i < 8; $i++) {
-						echo "<input type='radio' name='qq_" . $row['id'] . "_" . $row['questno'] . "' value='" . $i . "'>";
-					}
-					echo "</div></td></tr>";
-
-					// Labels
-					echo "<tr>";
-					echo "<td style='text-align:left;'>" . $row['labelA'] . "</td>";
-					echo "<td style='text-align:center;'>" . $row['labelC'] . "</td>";
-					echo "<td style='text-align:right;'>" . $row['labelB'] . "</td>";
-					echo "</tr>";
-
-					echo "</table>";
-					echo "</td>";
-					echo "</tr>";
-				} else if ($row['type'] == 3) {
-					echo "<tr>";
-					echo "<td><table style='width:100%'>";
-
-					// Question / Description
-					echo "<tr><td>" . $row['description'] . "</td></tr>";
-
-					// Text Input with Labels
-					echo "<td>" . $row['labelA'] . ":</td><td><input type='text' name='qq_" . $row['id'] . "_" . $row['questno'] . "' value='" . $row['labelC'] . "'></td>";
-
-					echo "</table></td>";
-					echo "</tr>";
-				} else if ($row['type'] == 1) {
-					echo "<tr>";
-					echo "<td><table style='width:100%'>";
-
-					// URL
-					echo "<tr><td>" . $row['labelA'] . " <a href='" . $row['description'] . "' target='_blank'>" . $row['description'] . "</a> " . $row['labelB'] . "</td></tr>";
-
-					echo "</table></td>";
-					echo "</tr>";
-				}
-			}
-			echo "</tbody>";
-			echo "<tfoot>";
-			echo "<tr>";
-			echo "<th>";
-			$actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-			$actual_link = explode("?", $actual_link)[0];
-			$actual_link = str_replace("editSurvey.php", "doSurvey.php", $actual_link);
-			echo "Survey URL: <a href='" . $actual_link . "?hash=" . $hash . "'>" . $actual_link . "?hash=" . $hash . "</a>";
-			echo "</th>";
-			echo "</tr>";
-			echo "</tfoot>";
-			echo "</table>";
+			$survey_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+			$survey_link = explode("?", $survey_link)[0];
+			$survey_link = str_replace("editSurvey.php", "doSurvey.php", $survey_link);
+			$survey_link .= "?hash=" . $hash;
+			echo "<div><strong>Survey URL</strong><div><code>". $survey_link ."</code></div></div>";
+			echo "<iframe width='800px' height='800px' src='".$survey_link."'></iframe>";
 		}
 	} else {
 		//

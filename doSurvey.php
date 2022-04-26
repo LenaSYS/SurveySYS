@@ -139,76 +139,80 @@
 					//echo "<tr><th>Rowno</th><th>Type</th><th>Labels (Left Right Center)</th><th>Description/Question</th></tr>";
 
 					$lastrow='UNK';
-					$rows = $query->fetchAll();	
+					$survey_items = $query->fetchAll();	
 			
 
 					echo "<h3>Survey</h3>";	
 				
-          echo "<table class='survey'>";
-          //echo "<caption>".$_SESSION['surveyname']."</caption>";
-          echo "<thead>";
-          echo "<tr>";
-          echo "<th>";
-          echo $_SESSION['surveyname'];
-          echo "</th>";
-          echo "</tr>";
-          echo "<tr>";
-          echo "<th>";
-          echo $_SESSION['surveydescription'];
-          echo "</th>";
-          echo "</tr>";
-          echo "</thead>";
-          echo "<tbody>";
-					foreach($rows as $row){              
-							if($row['type']==2){
-                  echo "<tr>";
-                  echo "<td>";
-                  echo "<table>";
-                  
-                  // Question / Description
-                  echo "<tr><td colspan='7'>".$row['description']."</td></tr>";
-                  
-                  // Radio Buttons
-                  echo "<tr>";
-                  for($i=1;$i<8;$i++){
-                      echo "<td><input type='radio' name='qq_".$row['id']."_".$row['questno']."' value='".$i."'></td>";
-                  }
-                  echo "</tr>";
-                
-                  // Labels
-                  echo "<tr>";
-                  echo "<td style='text-align:left;' colspan='2'>".$row['labelA']."</td>";
-                  echo "<td style='text-align:center;' colspan='3'>".$row['labelC']."</td>";
-                  echo "<td style='text-align:right;' colspan='2'>".$row['labelB']."</td>";								
-                  echo "</tr>";								
-                  echo "</table>";
-                  echo "</td>";
-                  echo "</tr>";
-              }else if($row['type']==3){
-                  echo "<tr>";
-                  echo "<td><table>";
-
-                  // Question / Description
-                  echo "<tr><td colspan='2'>".$row['description']."</td></tr>";
-                
-                  // Text Input with Labels
-                  echo "<td>".$row['labelA'].":</td><td><input type='text' name='qq_".$row['id']."_".$row['questno']."' value='".$row['labelC']."'></td>";
-                  
-                  echo "</table></td>";
-                  echo "</tr>";
-              }else if($row['type']==1){
-                  echo "<tr>";
-                  echo "<td><table>";
-
-                  // URL
-                  echo "<tr><td colspan='2'>Visit <a href='".$row['description']."' target='_blank'>".$row['description']."</a> and answer the questions below.</td></tr>";                                  
-                  echo "</table></td>";
-                  echo "</tr>";
-              }
+					echo "<table class='survey'>";
+					//echo "<caption>".$_SESSION['surveyname']."</caption>";
+					echo "<thead>";
+					echo "<tr>";
+					echo "<th>";
+					echo $_SESSION['surveyname'];
+					echo "</th>";
+					echo "</tr>";
+					echo "<tr>";
+					echo "<th>";
+					echo "<div style='padding:2em 1em;'>";
+					echo $_SESSION['surveydescription'];
+					echo "</div>";
+					echo "</th>";
+					echo "</tr>";
+					echo "</thead>";
+					echo "<tbody>";
+					foreach ($survey_items as $row) {
+						if ($row['type'] == 2) {
+							echo "<tr>";
+							echo "<td>";
+							echo "<table style='width:100%;'>";
+		
+							// Question / Description
+							echo "<tr><td colspan='3'>" . $row['description'] . "</td></tr>";
+		
+							// Radio Buttons
+							echo "<tr><td colspan='3'><div style='display:flex;flex-wrap: nowrap;justify-content:space-between;'>";
+							for ($i = 1; $i < 8; $i++) {
+								echo "<input type='radio' name='qq_" . $row['id'] . "_" . $row['questno'] . "' value='" . $i . "'>";
+							}
+							echo "</div></td></tr>";
+		
+							// Labels
+							echo "<tr>";
+							echo "<td style='text-align:left;'>" . $row['labelA'] . "</td>";
+							echo "<td style='text-align:center;'>" . $row['labelC'] . "</td>";
+							echo "<td style='text-align:right;'>" . $row['labelB'] . "</td>";
+							echo "</tr>";
+		
+							echo "</table>";
+							echo "</td>";
+							echo "</tr>";
+						} else if ($row['type'] == 3) {
+							echo "<tr>";
+							echo "<td><table style='width:100%'>";
+		
+							// Question / Description
+							echo "<tr><td>" . $row['description'] . "</td></tr>";
+		
+							// Text Input with Labels
+							echo "<td>" . $row['labelA'] . ":</td><td><input type='text' name='qq_" . $row['id'] . "_" . $row['questno'] . "' value='" . $row['labelC'] . "'></td>";
+		
+							echo "</table></td>";
+							echo "</tr>";
+						} else if ($row['type'] == 1) {
+							echo "<tr>";
+							echo "<td><table style='width:100%'>";
+		
+							// URL
+							echo "<tr><td>" . $row['labelA'] . " <a href='" . $row['description'] . "' target='_blank'>" . $row['description'] . "</a> " . $row['labelB'] . "</td></tr>";
+		
+							echo "</table></td>";
+							echo "</tr>";
+						}
 					}
-          echo "</tbody>";
-          echo "<tfoot>";
-          echo "<tr>";
+					echo "</tbody>";
+					echo "<tfoot>";
+					echo "<tr>";
           echo "<th>";
           $actual_link = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
           echo "Survey URL: <a href='".$actual_link."'>".$actual_link."</a>";
